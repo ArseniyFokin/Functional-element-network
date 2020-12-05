@@ -155,6 +155,13 @@ def check_versh(x, y, flag):
     return False
 
 
+def check_edge():
+    global BUFFER_TIP
+    if BUFFER_TIP == 1 or BUFFER_TIP == 4 or BUFFER_TIP == 5:
+        return True
+    return False
+
+
 def back_line():
     global BUFFER_X, BUFFER_Y, BUFFER_TIP
     BUFFER_X = None
@@ -206,8 +213,11 @@ def paint(event):
                     class1.check = True
                 if BUFFER_TIP == 5:
                     class2.check = True
-                a = func_edge(BUFFER_X, BUFFER_Y, event.x, event.y, class1, class2)
-                b = func_edge(BUFFER_X, BUFFER_Y, event.x, event.y, class2, class1)
+                flag = check_edge()
+                if flag:
+                    a = func_edge(BUFFER_X, BUFFER_Y, event.x, event.y, class2, class1)
+                else:
+                    a = func_edge(BUFFER_X, BUFFER_Y, event.x, event.y, class1, class2)
                 in1 = -1
                 in2 = -1
                 for i in range(len(ALL_TRANSISTIR)):
@@ -216,10 +226,11 @@ def paint(event):
                 for i in range(len(ALL_TRANSISTIR)):
                     if ALL_TRANSISTIR[i][-1] == class2:
                         in2 = i
-                EDGE[in1].append(in2)
-                EDGE[in2].append(in1)
+                if flag:
+                    EDGE[in2].append(in1)
+                else:
+                    EDGE[in1].append(in2)
                 EDGE_ELEMENT.append(a)
-                EDGE_ELEMENT.append(b)
                 a.draw()
         BUFFER_X = None
         BUFFER_Y = None
