@@ -14,10 +14,10 @@ FUNCTIONAL_ELEMENT = list()
 EDGE_ELEMENT = list()
 START_LIST = list()
 NO_ELEMENT = list()
-START = []
-ALL_TRANSISTIR = []
-EDGE = []
-FINALL = []
+START = []  # Массив стартовых состояний
+ALL_TRANSISTIR = []  # Массив всех вершин
+EDGE = []  # Массив всех рёбер
+FINALL = []  # Массив финальных состояний
 
 
 class func_versh_3:
@@ -274,7 +274,7 @@ def fSTART(event):
 
 def CLEAR(event):
     global FUNCELEMENT, BUFFER_X, BUFFER_Y, BUFFER_TIP, v
-    global FUNCTIONAL_ELEMENT, EDGE_ELEMENT, FINALL, START_LIST, ALL_TRANSISTIR, NO_ELEMENT, EDGE
+    global FUNCTIONAL_ELEMENT, EDGE_ELEMENT, FINALL, START_LIST, ALL_TRANSISTIR, NO_ELEMENT, EDGE, START
     FUNCELEMENT = None
     BUFFER_X = None
     BUFFER_Y = None
@@ -282,11 +282,12 @@ def CLEAR(event):
     v = None
     FUNCTIONAL_ELEMENT = list()
     EDGE_ELEMENT = list()
-    FINALL = list()
     START_LIST = list()
-    ALL_TRANSISTIR = list()
     NO_ELEMENT = list()
+    START = []
+    ALL_TRANSISTIR = []
     EDGE = []
+    FINALL = []
     canvas.delete("all")
 
 
