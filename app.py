@@ -1,5 +1,5 @@
 from tkinter import *
-from calculater import calculate_finish_sign
+from calculator import calculate_finish_sign
 
 canvas_width = 700
 canvas_height = 500
