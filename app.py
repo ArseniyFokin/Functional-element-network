@@ -14,10 +14,12 @@ v = None
 FUNCTIONAL_ELEMENT = list()
 EDGE_ELEMENT = list()
 START_LIST = list()
+FINALL_LIST = list()
 NO_ELEMENT = list()
+ALL_TRANSISTIR = list()
 START = []  # Массив стартовых состояний
-ALL_TRANSISTIR = []  # Массив всех вершин
 EDGE = []  # Массив всех рёбер
+VERSH = []  # Массив всех вершин
 FINALL = []  # Массив финальных состояний
 
 
@@ -95,7 +97,7 @@ class Finish_versh:
     def paint(self):
         canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
         canvas.create_oval(self.x - 4, self.y - 15 - 4, self.x + 4, self.y - 15 + 4, fill="black", outline="black")
-        canvas.create_text(self.x, self.y, text="F" + str(len(FINALL)))
+        canvas.create_text(self.x, self.y, text="F" + str(len(FINALL_LIST)))
 
 
 class NO_versh:
@@ -138,7 +140,7 @@ def check_versh(x, y, flag):
             if flag == 1:
                 BUFFER_TIP = 3
             return SE
-    for SE in FINALL:
+    for SE in FINALL_LIST:
         if (x - SE.in_x) ** 2 + (y - SE.in_y) ** 2 <= 16 and SE.check == False:
             if flag == 1:
                 BUFFER_TIP = 4
@@ -183,12 +185,14 @@ def paint(event):
         EDGE.append([])
         ALL_TRANSISTIR.append([5, 5, a])
         FUNCTIONAL_ELEMENT.append(a)
+        VERSH.append([5, 5])
         a.draw()
     elif FUNCELEMENT == "AND":
         a = func_versh_3("AND", event.x, event.y)
         EDGE.append([])
         ALL_TRANSISTIR.append([6, 6, a])
         FUNCTIONAL_ELEMENT.append(a)
+        VERSH.append([6, 6])
         a.draw()
     elif FUNCELEMENT == "EDGE" and BUFFER_X is None and BUFFER_Y is None:
         FE = check_versh(event.x, event.y, 1)
@@ -206,14 +210,16 @@ def paint(event):
                     BUFFER_TIP != 5 or tip != 1) and (BUFFER_TIP != 1 or tip != 5):
                 if BUFFER_TIP == 1:
                     class2.check_in(event.x, event.y)
-                if tip == 1:
+                elif tip == 1:
                     class1.check_in(BUFFER_X, BUFFER_Y)
-                if BUFFER_TIP == 4 and ((event.x - class2.in_x) ** 2 + (event.y - class2.in_y) ** 2 <= 9):
+                elif BUFFER_TIP == 4 and ((event.x - class2.in_x) ** 2 + (event.y - class2.in_y) ** 2 <= 9):
                     class2.check = True
-                if tip == 4 and ((BUFFER_X - class1.in_x) ** 2 + (BUFFER_Y - class1.in_y) ** 2 <= 9):
+                elif tip == 4 and ((BUFFER_X - class1.in_x) ** 2 + (BUFFER_Y - class1.in_y) ** 2 <= 9):
                     class1.check = True
-                if BUFFER_TIP == 5:
+                elif BUFFER_TIP == 5:
                     class2.check = True
+                elif tip == 5:
+                    class1.check = True
                 flag = check_edge()
                 if flag:
                     a = func_edge(BUFFER_X, BUFFER_Y, event.x, event.y, class2, class1)
@@ -241,28 +247,32 @@ def paint(event):
         a = Start_versh(event.x, event.y)
         EDGE.append([])
         ALL_TRANSISTIR.append([3, len(START_LIST), a])
+        VERSH.append([3, len(START_LIST)])
         START_LIST.append(a)
-        START.append([-1, a])
+        START.append([-1])
         a.paint()
     elif FUNCELEMENT == "Finish":
         a = Finish_versh(event.x, event.y)
-        FINALL.append(a)
+        FINALL.append(len(ALL_TRANSISTIR))
+        VERSH.append([7, 7])
+        FINALL_LIST.append(a)
         EDGE.append([])
         ALL_TRANSISTIR.append([7, 7, a])
         a.paint()
     elif FUNCELEMENT == "NO":
         a = NO_versh(event.x, event.y)
         EDGE.append([])
+        VERSH.append([4, 4])
         NO_ELEMENT.append(a)
         ALL_TRANSISTIR.append([4, 4, a])
         a.paint()
 
 
 def TEST(event):
-    print(ALL_TRANSISTIR)
-    print(EDGE)
-    print(START)
-    print(FINALL)
+    print(VERSH)  # Массив вершин
+    print(EDGE)  # Массив рёбер
+    print(START)  # Массив стартовых вершин
+    print(FINALL)  # Массив финальных вершин
 
 
 def BUTTON(event):
@@ -286,7 +296,7 @@ def fSTART(event):
 
 def CLEAR(event):
     global FUNCELEMENT, BUFFER_X, BUFFER_Y, BUFFER_TIP, v
-    global FUNCTIONAL_ELEMENT, EDGE_ELEMENT, FINALL, START_LIST, ALL_TRANSISTIR, NO_ELEMENT, EDGE, START
+    global FUNCTIONAL_ELEMENT, EDGE_ELEMENT, FINALL, START_LIST, ALL_TRANSISTIR, NO_ELEMENT, EDGE, START, VERSH
     FUNCELEMENT = None
     BUFFER_X = None
     BUFFER_Y = None
@@ -297,7 +307,8 @@ def CLEAR(event):
     START_LIST = list()
     NO_ELEMENT = list()
     START = []
-    ALL_TRANSISTIR = []
+    ALL_TRANSISTIR = list()
+    VERSH = []
     EDGE = []
     FINALL = []
     canvas.delete("all")
