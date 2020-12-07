@@ -207,7 +207,11 @@ def paint(event):
             class2 = check_versh(event.x, event.y, 1)
             if BUFFER_TIP != tip and (class1.x != class2.x and class1.y != class2.y) and (
                     BUFFER_TIP != 3 or tip != 2) and (BUFFER_TIP != 2 or tip != 3) and (
-                    BUFFER_TIP != 5 or tip != 1) and (BUFFER_TIP != 1 or tip != 5):
+                    BUFFER_TIP != 5 or tip != 1) and (BUFFER_TIP != 1 or tip != 5) and (
+                    BUFFER_TIP != 1 or tip != 4) and (BUFFER_TIP != 4 or tip != 1) and (
+                    BUFFER_TIP != 3 or tip != 6) and (BUFFER_TIP != 6 or tip != 3) and (
+                    BUFFER_TIP != 2 or tip != 6) and (BUFFER_TIP != 6 or tip != 2) and (
+                    BUFFER_TIP != 5 or tip != 4) and (BUFFER_TIP != 4 or tip != 5):
                 if BUFFER_TIP == 1:
                     class2.check_in(event.x, event.y)
                 elif tip == 1:
@@ -332,6 +336,7 @@ def CLEAR(event):
 
 root = Tk()
 root.title("Functional element network")
+root.resizable(False, False)
 
 canvas = Canvas(root, width=canvas_width, height=canvas_height, bg="white")
 bAND = Button(text="AND", command=None)
