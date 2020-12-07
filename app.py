@@ -281,15 +281,22 @@ def BUTTON(event):
 
 
 def CREATE(event):
-    result = calculate_finish_sign(START, FINALL, VERSH, EDGE)
-    lFINISH.config(text=result)
+    try:
+        result = calculate_finish_sign(START, FINALL, VERSH, EDGE)
+    except:
+        result = [None]
+    if None not in result:
+        lFINISH.config(text=result)
+    else:
+        lFINISH.config(text="Error")
+    bCREATE.grid_remove()
 
 
 def fSTART(event):
     if len(lSTART.get()) == len(START):
         text = list(lSTART.get())
         for i in range(len(START_LIST)):
-            START[i][0] = int(text[i])
+            START[i] = int(text[i])
         bCREATE.grid()
     else:
         bCREATE.grid_remove()
