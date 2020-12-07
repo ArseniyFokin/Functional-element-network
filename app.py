@@ -249,7 +249,7 @@ def paint(event):
         ALL_TRANSISTIR.append([3, len(START_LIST), a])
         VERSH.append([3, len(START_LIST)])
         START_LIST.append(a)
-        START.append([-1])
+        START.append(-1)
         a.paint()
     elif FUNCELEMENT == "Finish":
         a = Finish_versh(event.x, event.y)
@@ -301,14 +301,14 @@ def CLEAR(event):
     FUNCELEMENT = None
     BUFFER_X = None
     BUFFER_Y = None
-    BUFFER_TIP = 0
+    BUFFER_TIP = None
     v = None
     FUNCTIONAL_ELEMENT = list()
     EDGE_ELEMENT = list()
     START_LIST = list()
     NO_ELEMENT = list()
-    START = []
     ALL_TRANSISTIR = list()
+    START = []
     VERSH = []
     EDGE = []
     FINALL = []
