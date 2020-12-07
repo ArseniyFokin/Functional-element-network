@@ -121,12 +121,12 @@ class NO_versh:
 def check_versh(x, y, flag):
     global BUFFER_TIP
     for FE in FUNCTIONAL_ELEMENT:
-        if (x - FE.in1_x) ** 2 + (y - FE.in1_y) ** 2 <= 16 and FE.check_in1 == False:
+        if (x - FE.in1_x) ** 2 + (y - FE.in1_y) ** 2 <= 16 and not FE.check_in1:
             if flag == 1:
                 BUFFER_TIP = 1
             return FE
     for FE in FUNCTIONAL_ELEMENT:
-        if (x - FE.in2_x) ** 2 + (y - FE.in2_y) ** 2 <= 16 and FE.check_in2 == False:
+        if (x - FE.in2_x) ** 2 + (y - FE.in2_y) ** 2 <= 16 and not FE.check_in2:
             if flag == 1:
                 BUFFER_TIP = 1
             return FE
@@ -135,26 +135,26 @@ def check_versh(x, y, flag):
             if flag == 1:
                 BUFFER_TIP = 2
             return FE
-    for SE in START_LIST:
-        if (x - SE.out_x) ** 2 + (y - SE.out_y) ** 2 <= 16:
+    for SL in START_LIST:
+        if (x - SL.out_x) ** 2 + (y - SL.out_y) ** 2 <= 16:
             if flag == 1:
                 BUFFER_TIP = 3
-            return SE
-    for SE in FINALL_LIST:
-        if (x - SE.in_x) ** 2 + (y - SE.in_y) ** 2 <= 16 and SE.check == False:
+            return SL
+    for FL in FINALL_LIST:
+        if (x - FL.in_x) ** 2 + (y - FL.in_y) ** 2 <= 16 and not FL.check:
             if flag == 1:
                 BUFFER_TIP = 4
-            return SE
-    for NE in NO_ELEMENT:
-        if (x - NE.in_x) ** 2 + (y - NE.in_y) ** 2 <= 16 and NE.check == False:
+            return FL
+    for NOE in NO_ELEMENT:
+        if (x - NOE.in_x) ** 2 + (y - NOE.in_y) ** 2 <= 16 and not NOE.check:
             if flag == 1:
                 BUFFER_TIP = 5
-            return NE
-    for NE in NO_ELEMENT:
-        if (x - NE.out_x) ** 2 + (y - NE.out_y) ** 2 <= 16:
+            return NOE
+    for NOE in NO_ELEMENT:
+        if (x - NOE.out_x) ** 2 + (y - NOE.out_y) ** 2 <= 16:
             if flag == 1:
                 BUFFER_TIP = 6
-            return NE
+            return NOE
     return False
 
 
@@ -278,6 +278,13 @@ def TEST(event):
 def BUTTON(event):
     global FUNCELEMENT
     FUNCELEMENT = event.widget.cget('text')
+    bAND['bg'] = 'SystemButtonFace'
+    bOR['bg'] = 'SystemButtonFace'
+    bNO['bg'] = 'SystemButtonFace'
+    bEDGE['bg'] = 'SystemButtonFace'
+    bSTART['bg'] = 'SystemButtonFace'
+    bFINISH['bg'] = 'SystemButtonFace'
+    event.widget['bg'] = '#00ff00'
 
 
 def CREATE(event):
@@ -304,7 +311,7 @@ def fSTART(event):
 
 def CLEAR(event):
     global FUNCELEMENT, BUFFER_X, BUFFER_Y, BUFFER_TIP, v
-    global FUNCTIONAL_ELEMENT, EDGE_ELEMENT, FINALL, START_LIST, ALL_TRANSISTIR, NO_ELEMENT, EDGE, START, VERSH
+    global FUNCTIONAL_ELEMENT, EDGE_ELEMENT, FINALL, START_LIST, ALL_TRANSISTIR, NO_ELEMENT, EDGE, START, VERSH, FINALL_LIST
     FUNCELEMENT = None
     BUFFER_X = None
     BUFFER_Y = None
@@ -313,6 +320,7 @@ def CLEAR(event):
     FUNCTIONAL_ELEMENT = list()
     EDGE_ELEMENT = list()
     START_LIST = list()
+    FINALL_LIST = list()
     NO_ELEMENT = list()
     ALL_TRANSISTIR = list()
     START = []
@@ -368,5 +376,7 @@ bCLEAR.bind("<Button-1>", CLEAR)
 bCREATESTART.bind("<Button-1>", fSTART)
 canvas.bind("<Button-1>", paint)
 canvas.bind("<Button-3>", back_line)
+
+print(bAND["bg"])
 
 root.mainloop()
