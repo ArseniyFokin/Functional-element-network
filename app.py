@@ -8,7 +8,7 @@ brush_color = "black"
 FUNCELEMENT = None
 BUFFER_X = None
 BUFFER_Y = None
-BUFFER_TIP = 0
+BUFFER_TIP = None
 v = None
 
 FUNCTIONAL_ELEMENT = list()
@@ -194,13 +194,13 @@ def paint(event):
         FUNCTIONAL_ELEMENT.append(a)
         VERSH.append([6, 6])
         a.draw()
-    elif FUNCELEMENT == "EDGE" and BUFFER_X is None and BUFFER_Y is None:
+    elif FUNCELEMENT == "EDGE" and BUFFER_X is None and BUFFER_Y is None and BUFFER_TIP is None:
         FE = check_versh(event.x, event.y, 1)
         if FE:
             BUFFER_X = event.x
             BUFFER_Y = event.y
             v = canvas.create_oval(50, 50, 75, 75, outline="green", fill="green")
-    elif FUNCELEMENT == "EDGE" and BUFFER_X is not None and BUFFER_Y is not None:
+    elif FUNCELEMENT == "EDGE" and BUFFER_X is not None and BUFFER_Y is not None and BUFFER_TIP is not None:
         tip = BUFFER_TIP
         class1 = check_versh(BUFFER_X, BUFFER_Y, 1)
         if check_versh(event.x, event.y, 0):
@@ -281,7 +281,8 @@ def BUTTON(event):
 
 
 def CREATE(event):
-    pass
+    result = calculate_finish_sign(START, FINALL, VERSH, EDGE)
+    lFINISH.config(text=result)
 
 
 def fSTART(event):
@@ -328,7 +329,7 @@ bCREATE = Button(text="Построить", command=None)
 bCHECK = Button(text="Тест", command=None)
 bCLEAR = Button(text="Очистить поле", command=None)
 lSTART = Entry()
-lFINISH = Entry()
+lFINISH = Label()
 LabelFinish = Label(text="Finish:")
 bCREATESTART = Button(text="Задать Start", command=None)
 
