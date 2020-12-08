@@ -17,6 +17,7 @@ START_LIST = list()
 FINALL_LIST = list()
 NO_ELEMENT = list()
 ALL_TRANSISTIR = list()
+TEMP_START = []
 START = []  # Массив стартовых состояний
 EDGE = []  # Массив всех рёбер
 VERSH = []  # Массив всех вершин
@@ -55,7 +56,7 @@ class func_versh_3:
     def check_in(self, x, y):
         if (x - self.in1_x) ** 2 + (y - self.in1_y) ** 2 <= 16:
             self.check_in1 = True
-        if (x - self.in2_x) ** 2 + (y - self.in2_y) ** 2 <= 16:
+        elif (x - self.in2_x) ** 2 + (y - self.in2_y) ** 2 <= 16:
             self.check_in2 = True
 
 
@@ -73,17 +74,20 @@ class func_edge:
 
 
 class Start_versh:
-    def __init__(self, x, y):
+    def __init__(self, x, y, value):
         self.x = x
         self.y = y
         self.out_x = x
         self.out_y = y + 15
-        self.value = None
+        self.value = value
 
     def paint(self):
         canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
         canvas.create_oval(self.x - 4, self.y + 15 - 4, self.x + 4, self.y + 15 + 4, fill="black", outline="black")
-        canvas.create_text(self.x, self.y, text="S" + str(len(START_LIST)))
+        if self.value == "Start":
+            canvas.create_text(self.x, self.y, text="S" + str(len(START_LIST)))
+        else:
+            canvas.create_text(self.x, self.y, text=self.value)
 
 
 class Finish_versh:
@@ -201,13 +205,13 @@ def paint(event):
         if FE:
             BUFFER_X = event.x
             BUFFER_Y = event.y
-            v = canvas.create_oval(50, 50, 75, 75, outline="#00ff00", fill="#00ff00")
+            v = canvas.create_oval(50, 50, 75, 75, outline="#000000", fill="#00ff00")
     elif FUNCELEMENT == "EDGE" and BUFFER_X is not None and BUFFER_Y is not None and BUFFER_TIP is not None:
         tip = BUFFER_TIP
         class1 = check_versh(BUFFER_X, BUFFER_Y, 1)
         if check_versh(event.x, event.y, 0):
             class2 = check_versh(event.x, event.y, 1)
-            if BUFFER_TIP != tip and (class1.x != class2.x and class1.y != class2.y) and (
+            if BUFFER_TIP != tip and (class1.x != class2.x or class1.y != class2.y) and (
                     BUFFER_TIP != 3 or tip != 2) and (BUFFER_TIP != 2 or tip != 3) and (
                     BUFFER_TIP != 5 or tip != 1) and (BUFFER_TIP != 1 or tip != 5) and (
                     BUFFER_TIP != 1 or tip != 4) and (BUFFER_TIP != 4 or tip != 1) and (
@@ -218,9 +222,9 @@ def paint(event):
                     class2.check_in(event.x, event.y)
                 elif tip == 1:
                     class1.check_in(BUFFER_X, BUFFER_Y)
-                elif BUFFER_TIP == 4 and ((event.x - class2.in_x) ** 2 + (event.y - class2.in_y) ** 2 <= 9):
+                elif BUFFER_TIP == 4:
                     class2.check = True
-                elif tip == 4 and ((BUFFER_X - class1.in_x) ** 2 + (BUFFER_Y - class1.in_y) ** 2 <= 9):
+                elif tip == 4:
                     class1.check = True
                 elif BUFFER_TIP == 5:
                     class2.check = True
@@ -249,13 +253,18 @@ def paint(event):
         BUFFER_Y = None
         BUFFER_TIP = None
         canvas.delete(v)
-    elif FUNCELEMENT == "Start":
-        a = Start_versh(event.x, event.y)
+    elif FUNCELEMENT == "Start" or FUNCELEMENT == "0" or FUNCELEMENT == "1":
+        a = Start_versh(event.x, event.y, FUNCELEMENT)
         EDGE.append([])
         ALL_TRANSISTIR.append([3, len(START_LIST), a])
         VERSH.append([3, len(START_LIST)])
         START_LIST.append(a)
-        START.append(-1)
+        if FUNCELEMENT == "Start":
+            START.append(-1)
+        elif FUNCELEMENT == "1":
+            START.append(1)
+        elif FUNCELEMENT == "0":
+            START.append(0)
         a.paint()
     elif FUNCELEMENT == "Finish":
         a = Finish_versh(event.x, event.y)
@@ -290,12 +299,14 @@ def BUTTON(event):
     bEDGE['bg'] = 'SystemButtonFace'
     bSTART['bg'] = 'SystemButtonFace'
     bFINISH['bg'] = 'SystemButtonFace'
+    bONE['bg'] = 'SystemButtonFace'
+    bZERO['bg'] = 'SystemButtonFace'
     event.widget['bg'] = '#00ff00'
 
 
 def CREATE(event):
     try:
-        result = calculate_finish_sign(START, FINALL, VERSH, EDGE)
+        result = calculate_finish_sign(TEMP_START, FINALL, VERSH, EDGE)
     except:
         result = [None]
     if None not in result:
@@ -306,10 +317,15 @@ def CREATE(event):
 
 
 def fSTART(event):
-    if len(lSTART.get()) == len(START):
+    global TEMP_START
+    TEMP_START = [START[i] for i in range(len(START))]
+    if len(lSTART.get()) == START.count(-1):
         text = list(lSTART.get())
-        for i in range(len(START_LIST)):
-            START[i] = int(text[i])
+        i = 0
+        for j in range(len(START)):
+            if START[j] == -1:
+                TEMP_START[j] = int(text[i])
+                i += 1
         bCREATE.grid()
     else:
         bCREATE.grid_remove()
@@ -317,7 +333,7 @@ def fSTART(event):
 
 def CLEAR(event):
     global FUNCELEMENT, BUFFER_X, BUFFER_Y, BUFFER_TIP, v
-    global FUNCTIONAL_ELEMENT, EDGE_ELEMENT, FINALL, START_LIST, ALL_TRANSISTIR, NO_ELEMENT, EDGE, START, VERSH, FINALL_LIST
+    global FUNCTIONAL_ELEMENT, EDGE_ELEMENT, FINALL, START_LIST, ALL_TRANSISTIR, NO_ELEMENT, EDGE, START, VERSH, FINALL_LIST, TEMP_START
     FUNCELEMENT = None
     BUFFER_X = None
     BUFFER_Y = None
@@ -329,6 +345,7 @@ def CLEAR(event):
     FINALL_LIST = list()
     NO_ELEMENT = list()
     ALL_TRANSISTIR = list()
+    TEMP_START = []
     START = []
     VERSH = []
     EDGE = []
@@ -347,29 +364,33 @@ bNO = Button(text="NO", command=None)
 bEDGE = Button(text="EDGE", command=None)
 bSTART = Button(text="Start", command=None)
 bFINISH = Button(text="Finish", command=None)
+bONE = Button(text="0", command=None)
+bZERO = Button(text="1", command=None)
 bCREATE = Button(text="Построить", command=None)
 bCHECK = Button(text="Тест", command=None)
 bCLEAR = Button(text="Очистить поле", command=None)
 lSTART = Entry()
-lFINISH = Label()
-LabelFinish = Label(text="Finish:")
+lFINISH = Label(bg='#ffffff')
+LabelFinish = Label(text="          Finish:           ", anchor="center")
 bCREATESTART = Button(text="Задать Start", command=None)
 
 bAND.grid(row=0, column=0, sticky=N + S + W + E)
 bOR.grid(row=0, column=1, sticky=N + S + W + E)
 bNO.grid(row=0, column=2, sticky=N + S + W + E)
 bEDGE.grid(row=0, column=3, sticky=N + S + W + E)
-bSTART.grid(row=0, column=4, sticky=N + S + W + E)
-bFINISH.grid(row=0, column=5, sticky=N + S + W + E)
-bCHECK.grid(row=2, column=0, sticky=N + S + W + E)
-bCREATE.grid(row=2, column=1, columnspan=3, sticky=N + S + W + E)
+bSTART.grid(row=1, column=0, sticky=N + S + W + E)
+bFINISH.grid(row=1, column=1, sticky=N + S + W + E)
+bONE.grid(row=1, column=2, sticky=N + S + W + E)
+bZERO.grid(row=1, column=3, sticky=N + S + W + E)
+canvas.grid(row=2, column=0, columnspan=4)
+bCHECK.grid(row=3, column=0, sticky=N + S + W + E)
+bCREATE.grid(row=3, column=1, columnspan=2, sticky=N + S + W + E)
 bCREATE.grid_remove()
-bCLEAR.grid(row=2, column=4, columnspan=2, sticky=N + S + W + E)
-bCREATESTART.grid(row=3, column=0, sticky=N + S + W + E)
-lSTART.grid(row=3, column=1, columnspan=2, sticky=N + S + W + E)
-LabelFinish.grid(row=3, column=3, sticky=N + S + W + E)
-lFINISH.grid(row=3, column=4, columnspan=2, sticky=N + S + W + E)
-canvas.grid(row=1, column=0, columnspan=6)
+bCLEAR.grid(row=3, column=3, sticky=N + S + W + E)
+bCREATESTART.grid(row=4, column=0, sticky=N + S + W + E)
+lSTART.grid(row=4, column=1, sticky=N + S + W + E)
+LabelFinish.grid(row=4, column=2, sticky=N + S + W + E)
+lFINISH.grid(row=4, column=3, sticky=N + S + W + E)
 
 bAND.bind("<Button-1>", BUTTON)
 bOR.bind("<Button-1>", BUTTON)
@@ -377,13 +398,13 @@ bNO.bind("<Button-1>", BUTTON)
 bEDGE.bind("<Button-1>", BUTTON)
 bSTART.bind("<Button-1>", BUTTON)
 bFINISH.bind("<Button-1>", BUTTON)
+bONE.bind("<Button-1>", BUTTON)
+bZERO.bind("<Button-1>", BUTTON)
 bCREATE.bind("<Button-1>", CREATE)
 bCHECK.bind("<Button-1>", TEST)
 bCLEAR.bind("<Button-1>", CLEAR)
 bCREATESTART.bind("<Button-1>", fSTART)
 canvas.bind("<Button-1>", paint)
 canvas.bind("<Button-3>", back_line)
-
-print(bAND["bg"])
 
 root.mainloop()
