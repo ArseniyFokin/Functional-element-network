@@ -112,10 +112,12 @@ class NO_versh:
         self.check = False
 
     def paint(self):
-        canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
+        canvas.create_line(self.x - 15, self.y - 15, self.x + 15, self.y - 15, self.x, self.y + 15, self.x - 15,
+                           self.y - 15)
+        # canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
         canvas.create_oval(self.x - 4, self.y - 15 - 4, self.x + 4, self.y - 15 + 4, fill="black", outline="black")
         canvas.create_oval(self.x - 4, self.y + 15 - 4, self.x + 4, self.y + 15 + 4, fill="black", outline="black")
-        canvas.create_text(self.x, self.y, text="NO")
+        canvas.create_text(self.x, self.y - 10, text="__")
 
 
 def check_versh(x, y, flag):
@@ -199,7 +201,7 @@ def paint(event):
         if FE:
             BUFFER_X = event.x
             BUFFER_Y = event.y
-            v = canvas.create_oval(50, 50, 75, 75, outline="green", fill="green")
+            v = canvas.create_oval(50, 50, 75, 75, outline="#00ff00", fill="#00ff00")
     elif FUNCELEMENT == "EDGE" and BUFFER_X is not None and BUFFER_Y is not None and BUFFER_TIP is not None:
         tip = BUFFER_TIP
         class1 = check_versh(BUFFER_X, BUFFER_Y, 1)
