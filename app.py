@@ -85,7 +85,7 @@ class Start_versh:
         canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
         canvas.create_oval(self.x - 4, self.y + 15 - 4, self.x + 4, self.y + 15 + 4, fill="black", outline="black")
         if self.value == "Start":
-            canvas.create_text(self.x, self.y, text="S" + str(len(START_LIST)))
+            canvas.create_text(self.x, self.y, text="S" + str(START.count(-1)))
         else:
             canvas.create_text(self.x, self.y, text=self.value)
 
