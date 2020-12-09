@@ -292,6 +292,19 @@ def TEST(event):
     print(FINALL)  # Массив финальных вершин
 
 
+def INFO(event):
+    Temp_windows = Toplevel(root)
+    Temp_windows.resizable(False, False)
+    Temp_windows.minsize(200, 200)
+    Temp_windows.title('Info')
+    Temp_finish_label = Label(Temp_windows, bg='#ffffff', bd=0)
+    text = "AND:\n0 Λ 0 -> 0\n0 Λ 1 -> 0\n1 Λ 0 -> 0\n1 Λ 1 -> 1\n"
+    text += "OR:\n0 V 0 -> 0\n0 V 1 -> 1\n1 V 0 -> 1\n1 V 1 -> 1\n"
+    text += "NO:\n0 -> 1\n1 -> 0\n"
+    Temp_finish_label.configure(text=text, anchor="center", font="Arial 14")
+    Temp_finish_label.pack(expand=True, fill=BOTH)
+
+
 def BUTTON(event):
     global FUNCELEMENT
     FUNCELEMENT = event.widget.cget('text')
@@ -386,7 +399,7 @@ bFINISH = Button(text="Finish", command=None)
 bONE = Button(text="0", command=None)
 bZERO = Button(text="1", command=None)
 bCREATE = Button(text="Построить", command=None)
-bCHECK = Button(text="Тест", command=None)
+bCHECK = Button(text="Информация", command=None)
 bCLEAR = Button(text="Очистить поле", command=None)
 lSTART = Entry()
 lFINISH = Label(bg='#ffffff')
@@ -420,7 +433,8 @@ bFINISH.bind("<Button-1>", BUTTON)
 bONE.bind("<Button-1>", BUTTON)
 bZERO.bind("<Button-1>", BUTTON)
 bCREATE.bind("<Button-1>", CREATE)
-bCHECK.bind("<Button-1>", TEST)
+# bCHECK.bind("<Button-1>", TEST)
+bCHECK.bind("<Button-1>", INFO)
 bCLEAR.bind("<Button-1>", CLEAR)
 bCREATESTART.bind("<Button-1>", fSTART)
 canvas.bind("<Button-1>", paint)
