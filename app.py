@@ -1,5 +1,4 @@
 from tkinter import *
-from tkinter import messagebox
 
 from calculator import calculate_finish_sign, generate_bit_set
 
@@ -387,7 +386,9 @@ def CLEAR(event):
 
 root = Tk()
 root.title("Functional element network")
-root.resizable(False, False)
+root.resizable(True, True)
+root.grid_columnconfigure((0, 1, 2, 3), weight=1)
+root.grid_rowconfigure(2, weight=1)
 
 canvas = Canvas(root, width=canvas_width, height=canvas_height, bg="white")
 bAND = Button(text="AND", command=None)
@@ -403,7 +404,7 @@ bCHECK = Button(text="Информация", command=None)
 bCLEAR = Button(text="Очистить поле", command=None)
 lSTART = Entry()
 lFINISH = Label(bg='#ffffff')
-LabelFinish = Label(text="          Finish:           ", anchor="center")
+LabelFinish = Label(text="          Finish:          ", anchor="center")
 bCREATESTART = Button(text="Задать Start", command=None)
 
 bAND.grid(row=0, column=0, sticky=N + S + W + E)
@@ -414,7 +415,7 @@ bSTART.grid(row=1, column=0, sticky=N + S + W + E)
 bFINISH.grid(row=1, column=1, sticky=N + S + W + E)
 bONE.grid(row=1, column=2, sticky=N + S + W + E)
 bZERO.grid(row=1, column=3, sticky=N + S + W + E)
-canvas.grid(row=2, column=0, columnspan=4)
+canvas.grid(row=2, column=0, columnspan=4, sticky=N + S + W + E)
 bCHECK.grid(row=3, column=0, sticky=N + S + W + E)
 bCREATE.grid(row=3, column=1, columnspan=2, sticky=N + S + W + E)
 bCREATE.grid_remove()
