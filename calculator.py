@@ -52,3 +52,23 @@ def calculate_finish_point(s, start, vertex, edges, vertex_sign):
         return calculate_finish_point(edges[s][0], start, vertex, edges, vertex_sign)
     else:
         return None
+
+
+def generate_bit_set(mask):
+    size_mask = 0
+    for i in mask:
+        if i == '?':
+            size_mask = size_mask + 1
+
+    for i in range(2**size_mask):
+        ans = ''
+        cur_bitset = bin(i)[2:]
+        cur_bitset = '0' * (size_mask - len(cur_bitset)) + cur_bitset
+        cur = 0
+        for j in mask:
+            if j == '?':
+                ans = ans + cur_bitset[cur]
+                cur = cur + 1
+            else:
+                ans = ans + j
+        yield ans
