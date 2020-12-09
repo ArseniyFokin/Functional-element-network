@@ -1,5 +1,7 @@
 from tkinter import *
-from calculator import calculate_finish_sign
+from tkinter import messagebox
+
+from calculator import calculate_finish_sign, generate_bit_set
 
 canvas_width = 700
 canvas_height = 500
@@ -305,12 +307,28 @@ def BUTTON(event):
 
 
 def CREATE(event):
+    result = []
     try:
-        result = calculate_finish_sign(TEMP_START, FINALL, VERSH, EDGE)
+        for TS in generate_bit_set(TEMP_START):
+            TS = list(map(int, TS))
+            result.append([TS, calculate_finish_sign(TS, FINALL, VERSH, EDGE)])
     except:
-        result = [None]
-    if None not in result:
-        lFINISH.config(text=result)
+        result = None
+    if result is not None:
+        if len(result) == 1:
+            lFINISH.config(text=result[0][1])
+        else:
+            lFINISH.config(text="Success")
+            Temp_windows = Toplevel(root)
+            Temp_windows.resizable(False, False)
+            Temp_windows.minsize(200, 200)
+            Temp_windows.title('Finish')
+            Temp_finish_label = Label(Temp_windows, bg='#ffffff', bd=0)
+            text = "mask: " + "".join(TEMP_START) + "\n"
+            for i in result:
+                text += ("".join(map(str, i[0])) + " -> " + "".join(map(str, i[1])) + "\n")
+            Temp_finish_label.configure(text=text, anchor="center", font="Arial 14")
+            Temp_finish_label.pack(expand=True, fill=BOTH)
     else:
         lFINISH.config(text="Error")
     bCREATE.grid_remove()
@@ -318,13 +336,14 @@ def CREATE(event):
 
 def fSTART(event):
     global TEMP_START
+    Temp_text = "".join(i for i in lSTART.get() if i == '1' or i == '0' or i == '?')
     TEMP_START = [START[i] for i in range(len(START))]
-    if len(lSTART.get()) == START.count(-1):
-        text = list(lSTART.get())
+    if len(Temp_text) == START.count(-1):
+        text = list(Temp_text)
         i = 0
         for j in range(len(START)):
             if START[j] == -1:
-                TEMP_START[j] = int(text[i])
+                TEMP_START[j] = text[i]
                 i += 1
         bCREATE.grid()
     else:
