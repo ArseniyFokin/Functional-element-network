@@ -6,34 +6,34 @@
 
 После запуска в верхней части экрана появится выбор - какой элемент нарисовать:
 
-![](picture/element_example.PNG)
+![](picture/element_example.png)
 
 При нажатии на одну из 8 кнопок она выделяется зеленым
 
-![](picture/selection_example.PNG)
+![](picture/selection_example.png)
 
 Нажатие на экран рисует выбранный(подсвеченный зеленым) элемент
 
-![](picture/OR_example.PNG)
+![](picture/OR_example.png)
 
 2)Вычисление значений:
 
 Когда вы нарисовали СФЭ(на рисунке сумматор 2х бит) в левом нижнем углу задайте значения входных переменных(в соответсвии с их нумерацией в СФЭ) и нажмите "задать Start". Помимо значений можно передавать битовую маску заменяя какие - то входы знаком "?", тогда алгоритм выдаст результат для каждого возможного значения
 
-![](picture/start_example.PNG)
+![](picture/start_example.png)
 
 или
 
-![](picture/mask_start_example.PNG)
+![](picture/mask_start_example.png)
 
 После чего появится кнопка "построить"
 
-![](picture/build_example.PNG)
+![](picture/build_example.png)
 
 При нажатии на нее в правом нижнем поле появится результат работы(или сообщение об ошибке, если посчитать финальные состояния нельзя). Если вы передали не значения а маску, то появится новое окно со списком значений и результатом работы на каждом
 
-![](picture/finish_example.PNG)
+![](picture/finish_example.png)
 
 или
 
-![](picture/mask_finish_example.PNG)
+![](picture/mask_finish_example.png)
