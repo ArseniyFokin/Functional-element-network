@@ -12,6 +12,7 @@ BUFFER_Y = None
 BUFFER_TIP = None
 v = None
 
+RED_DEL = list()
 FUNCTIONAL_ELEMENT = list()
 EDGE_ELEMENT = list()
 START_LIST = list()
@@ -60,6 +61,12 @@ class func_versh_3:
         elif (x - self.in2_x) ** 2 + (y - self.in2_y) ** 2 <= 16:
             self.check_in2 = True
 
+    def in_False(self, x, y):
+        if (x - self.in1_x) ** 2 + (y - self.in1_y) ** 2 <= 16:
+            self.check_in1 = False
+        elif (x - self.in2_x) ** 2 + (y - self.in2_y) ** 2 <= 16:
+            self.check_in2 = False
+
 
 class func_edge:
     def __init__(self, in_x, in_y, out_x, out_y, class1, class2):
@@ -69,9 +76,13 @@ class func_edge:
         self.out_y = out_y
         self.class1 = class1
         self.class2 = class2
+        self.line = None
 
     def draw(self):
-        canvas.create_line(self.in_x, self.in_y, self.out_x, self.out_y)
+        self.line = canvas.create_line(self.in_x, self.in_y, self.out_x, self.out_y)
+
+    def delete(self):
+        canvas.delete(self.line)
 
 
 class Start_versh:
@@ -128,15 +139,21 @@ class NO_versh:
 def check_versh(x, y, flag):
     global BUFFER_TIP
     for FE in FUNCTIONAL_ELEMENT:
-        if (x - FE.in1_x) ** 2 + (y - FE.in1_y) ** 2 <= 16 and not FE.check_in1:
-            if flag == 1:
-                BUFFER_TIP = 1
-            return FE
+        if (x - FE.in1_x) ** 2 + (y - FE.in1_y) ** 2 <= 16:
+            if not FE.check_in1:
+                if flag == 1:
+                    BUFFER_TIP = 1
+                return FE
+            if flag == 2:
+                return FE
     for FE in FUNCTIONAL_ELEMENT:
-        if (x - FE.in2_x) ** 2 + (y - FE.in2_y) ** 2 <= 16 and not FE.check_in2:
-            if flag == 1:
-                BUFFER_TIP = 1
-            return FE
+        if (x - FE.in2_x) ** 2 + (y - FE.in2_y) ** 2 <= 16:
+            if not FE.check_in2:
+                if flag == 1:
+                    BUFFER_TIP = 1
+                return FE
+            if flag == 2:
+                return FE
     for FE in FUNCTIONAL_ELEMENT:
         if (x - FE.in3_x) ** 2 + (y - FE.in3_y) ** 2 <= 16:
             if flag == 1:
@@ -148,15 +165,21 @@ def check_versh(x, y, flag):
                 BUFFER_TIP = 3
             return SL
     for FL in FINALL_LIST:
-        if (x - FL.in_x) ** 2 + (y - FL.in_y) ** 2 <= 16 and not FL.check:
-            if flag == 1:
-                BUFFER_TIP = 4
-            return FL
+        if (x - FL.in_x) ** 2 + (y - FL.in_y) ** 2 <= 16:
+            if not FL.check:
+                if flag == 1:
+                    BUFFER_TIP = 4
+                return FL
+            if flag == 2:
+                return FL
     for NOE in NO_ELEMENT:
-        if (x - NOE.in_x) ** 2 + (y - NOE.in_y) ** 2 <= 16 and not NOE.check:
-            if flag == 1:
-                BUFFER_TIP = 5
-            return NOE
+        if (x - NOE.in_x) ** 2 + (y - NOE.in_y) ** 2 <= 16:
+            if not NOE.check:
+                if flag == 1:
+                    BUFFER_TIP = 5
+                return NOE
+            if flag == 2:
+                return NOE
     for NOE in NO_ELEMENT:
         if (x - NOE.out_x) ** 2 + (y - NOE.out_y) ** 2 <= 16:
             if flag == 1:
@@ -233,7 +256,7 @@ def paint(event):
                     class1.check = True
                 flag = check_edge()
                 if flag:
-                    a = func_edge(BUFFER_X, BUFFER_Y, event.x, event.y, class2, class1)
+                    a = func_edge(event.x, event.y, BUFFER_X, BUFFER_Y, class2, class1)
                 else:
                     a = func_edge(BUFFER_X, BUFFER_Y, event.x, event.y, class1, class2)
                 in1 = -1
@@ -282,6 +305,41 @@ def paint(event):
         NO_ELEMENT.append(a)
         ALL_TRANSISTIR.append([4, 4, a])
         a.paint()
+    elif FUNCELEMENT == "DEL":
+        DEE = None
+        for ee in EDGE_ELEMENT:
+            sr_x = (ee.in_x + ee.out_x) // 2
+            sr_y = (ee.in_y + ee.out_y) // 2
+            if (event.x - sr_x) ** 2 + (event.y - sr_y) ** 2 <= 16:
+                DEE = ee
+                break
+        if DEE is None:
+            return
+        delete_edge(DEE)
+
+
+def delete_edge(DEE):
+    global EDGE_ELEMENT, ALL_TRANSISTIR, EDGE
+    canvas.delete(RED_DEL[EDGE_ELEMENT.index(DEE)])
+    FEO = check_versh(DEE.out_x, DEE.out_y, 2)
+    FEI = check_versh(DEE.in_x, DEE.in_y, 2)
+    if type(FEI) is func_versh_3:
+        FEI.in_False(DEE.in_x, DEE.in_y)
+    else:
+        FEI.check = False
+    ind1 = None
+    ind2 = None
+    for i in range(len(ALL_TRANSISTIR)):
+        if ALL_TRANSISTIR[i][-1] == FEO:
+            ind1 = i
+    for i in range(len(ALL_TRANSISTIR)):
+        if ALL_TRANSISTIR[i][-1] == FEI:
+            ind2 = i
+    if ind1 is not None and ind2 is not None:
+        EDGE[ind2].remove(ind1)
+    del RED_DEL[EDGE_ELEMENT.index(DEE)]
+    EDGE_ELEMENT.remove(DEE)
+    DEE.delete()
 
 
 def TEST(event):
@@ -304,9 +362,7 @@ def INFO(event):
     Temp_finish_label.pack(expand=True, fill=BOTH)
 
 
-def BUTTON(event):
-    global FUNCELEMENT
-    FUNCELEMENT = event.widget.cget('text')
+def Color_Button():
     bAND['bg'] = 'SystemButtonFace'
     bOR['bg'] = 'SystemButtonFace'
     bNO['bg'] = 'SystemButtonFace'
@@ -315,7 +371,45 @@ def BUTTON(event):
     bFINISH['bg'] = 'SystemButtonFace'
     bONE['bg'] = 'SystemButtonFace'
     bZERO['bg'] = 'SystemButtonFace'
+    bDEL['bg'] = 'SystemButtonFace'
+
+
+def Clear_RED_DEL():
+    for rd in RED_DEL:
+        canvas.delete(rd)
+
+
+def DEL(event):
+    global FUNCELEMENT, RED_DEL
+    if event.widget['bg'] == '#00ff00':
+        event.widget['bg'] = 'SystemButtonFace'
+        FUNCELEMENT = None
+        Clear_RED_DEL()
+        RED_DEL = list()
+        return
+    Color_Button()
     event.widget['bg'] = '#00ff00'
+    for ee in EDGE_ELEMENT:
+        sr_x = (ee.in_x + ee.out_x) // 2
+        sr_y = (ee.in_y + ee.out_y) // 2
+        RED_DEL.append(canvas.create_oval(sr_x - 4, sr_y - 4, sr_x + 4, sr_y + 4, fill='red'))
+    for ee in ALL_TRANSISTIR:
+        RED_DEL.append(canvas.create_oval(ee[-1].x - 4, ee[-1].y - 4, ee[-1].x + 4, ee[-1].y + 4, fill='red'))
+    FUNCELEMENT = "DEL"
+
+
+def BUTTON(event):
+    global FUNCELEMENT, BUFFER_X, BUFFER_Y, BUFFER_TIP, RED_DEL
+    Clear_RED_DEL()
+    RED_DEL = list()
+    FUNCELEMENT = event.widget.cget('text')
+    Color_Button()
+    event.widget['bg'] = '#00ff00'
+    if v is not None:
+        canvas.delete(v)
+    BUFFER_X = None
+    BUFFER_Y = None
+    BUFFER_TIP = None
 
 
 def CREATE(event):
@@ -349,7 +443,7 @@ def CREATE(event):
 def fSTART(event):
     global TEMP_START
     Temp_text = "".join(i for i in lSTART.get() if i == '1' or i == '0' or i == '?')
-    TEMP_START = [START[i] for i in range(len(START))]
+    TEMP_START = [str(START[i]) for i in range(len(START))]
     if len(Temp_text) == START.count(-1):
         text = list(Temp_text)
         i = 0
@@ -364,12 +458,15 @@ def fSTART(event):
 
 def CLEAR(event):
     global FUNCELEMENT, BUFFER_X, BUFFER_Y, BUFFER_TIP, v
-    global FUNCTIONAL_ELEMENT, EDGE_ELEMENT, FINALL, START_LIST, ALL_TRANSISTIR, NO_ELEMENT, EDGE, START, VERSH, FINALL_LIST, TEMP_START
+    global FUNCTIONAL_ELEMENT, EDGE_ELEMENT, FINALL, START_LIST, ALL_TRANSISTIR, \
+        NO_ELEMENT, EDGE, START, VERSH, FINALL_LIST, TEMP_START, RED_DEL
     FUNCELEMENT = None
     BUFFER_X = None
     BUFFER_Y = None
     BUFFER_TIP = None
     v = None
+    Clear_RED_DEL()
+    RED_DEL = list()
     FUNCTIONAL_ELEMENT = list()
     EDGE_ELEMENT = list()
     START_LIST = list()
@@ -399,6 +496,7 @@ bSTART = Button(text="Start", command=None)
 bFINISH = Button(text="Finish", command=None)
 bONE = Button(text="0", command=None)
 bZERO = Button(text="1", command=None)
+bDEL = Button(text="Удаление", command=None)
 bCREATE = Button(text="Построить", command=None)
 bCHECK = Button(text="Информация", command=None)
 bCLEAR = Button(text="Очистить поле", command=None)
@@ -417,7 +515,8 @@ bONE.grid(row=1, column=2, sticky=N + S + W + E)
 bZERO.grid(row=1, column=3, sticky=N + S + W + E)
 canvas.grid(row=2, column=0, columnspan=4, sticky=N + S + W + E)
 bCHECK.grid(row=3, column=0, sticky=N + S + W + E)
-bCREATE.grid(row=3, column=1, columnspan=2, sticky=N + S + W + E)
+bDEL.grid(row=3, column=1, sticky=N + S + W + E)
+bCREATE.grid(row=3, column=2, columnspan=1, sticky=N + S + W + E)
 bCREATE.grid_remove()
 bCLEAR.grid(row=3, column=3, sticky=N + S + W + E)
 bCREATESTART.grid(row=4, column=0, sticky=N + S + W + E)
@@ -433,9 +532,10 @@ bSTART.bind("<Button-1>", BUTTON)
 bFINISH.bind("<Button-1>", BUTTON)
 bONE.bind("<Button-1>", BUTTON)
 bZERO.bind("<Button-1>", BUTTON)
+bDEL.bind("<Button-1>", DEL)
 bCREATE.bind("<Button-1>", CREATE)
-# bCHECK.bind("<Button-1>", TEST)
-bCHECK.bind("<Button-1>", INFO)
+bCHECK.bind("<Button-1>", TEST)
+# bCHECK.bind("<Button-1>", INFO)
 bCLEAR.bind("<Button-1>", CLEAR)
 bCREATESTART.bind("<Button-1>", fSTART)
 canvas.bind("<Button-1>", paint)
