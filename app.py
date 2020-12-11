@@ -1,6 +1,7 @@
 from tkinter import *
 
 from calculator import calculate_finish_sign, generate_bit_set
+from geometry import calculate_cursor_points
 
 canvas_width = 700
 canvas_height = 500
