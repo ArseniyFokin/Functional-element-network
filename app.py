@@ -41,20 +41,25 @@ class func_versh_3:
         self.fill = "green" if view == "AND" else "red"
         self.check_in1 = False
         self.check_in2 = False
+        self.line = None
+        self.oval = None
+        self.oval1 = None
+        self.oval2 = None
+        self.text = None
 
     def draw(self):
-        canvas.create_line(self.in1_x, self.in1_y, self.in2_x, self.in2_y, self.in3_x, self.in3_y, self.in1_x,
-                           self.in1_y, fill=self.fill)
-        canvas.create_oval(self.in1_x - 4, self.in1_y - 4, self.in1_x + 4, self.in1_y + 4, fill="black",
-                           outline="black")
-        canvas.create_oval(self.in2_x - 4, self.in2_y - 4, self.in2_x + 4, self.in2_y + 4, fill="black",
-                           outline="black")
-        canvas.create_oval(self.in3_x - 4, self.in3_y - 4, self.in3_x + 4, self.in3_y + 4, fill="black",
-                           outline="black")
+        self.line = canvas.create_line(self.in1_x, self.in1_y, self.in2_x, self.in2_y, self.in3_x, self.in3_y,
+                                       self.in1_x, self.in1_y, fill=self.fill)
+        self.oval = canvas.create_oval(self.in1_x - 4, self.in1_y - 4, self.in1_x + 4, self.in1_y + 4, fill="black",
+                                       outline="black")
+        self.oval1 = canvas.create_oval(self.in2_x - 4, self.in2_y - 4, self.in2_x + 4, self.in2_y + 4, fill="black",
+                                        outline="black")
+        self.oval2 = canvas.create_oval(self.in3_x - 4, self.in3_y - 4, self.in3_x + 4, self.in3_y + 4, fill="black",
+                                        outline="black")
         if self.view == "AND":
-            canvas.create_text(self.x, self.y - 5, text="Λ")
+            self.text = canvas.create_text(self.x, self.y - 5, text="Λ")
         else:
-            canvas.create_text(self.x, self.y - 5, text="v")
+            self.text = canvas.create_text(self.x, self.y - 5, text="v")
 
     def check_in(self, x, y):
         if (x - self.in1_x) ** 2 + (y - self.in1_y) ** 2 <= 16:
@@ -68,6 +73,13 @@ class func_versh_3:
         elif (x - self.in2_x) ** 2 + (y - self.in2_y) ** 2 <= 16:
             self.check_in2 = False
 
+    def delete(self):
+        canvas.delete(self.line)
+        canvas.delete(self.oval)
+        canvas.delete(self.oval1)
+        canvas.delete(self.oval2)
+        canvas.delete(self.text)
+
 
 class func_edge:
     def __init__(self, in_x, in_y, out_x, out_y, class1, class2):
@@ -78,12 +90,19 @@ class func_edge:
         self.class1 = class1
         self.class2 = class2
         self.line = None
+        self.line1 = None
+        self.line2 = None
 
     def draw(self):
         self.line = canvas.create_line(self.in_x, self.in_y, self.out_x, self.out_y)
+        x1, y1, x2, y2 = calculate_cursor_points(self.out_x, self.out_y, self.in_x, self.in_y)
+        self.line1 = canvas.create_line(self.in_x, self.in_y, x1, y1, width=2)
+        self.line2 = canvas.create_line(self.in_x, self.in_y, x2, y2, width=2)
 
     def delete(self):
         canvas.delete(self.line)
+        canvas.delete(self.line1)
+        canvas.delete(self.line2)
 
 
 class Start_versh:
@@ -93,14 +112,26 @@ class Start_versh:
         self.out_x = x
         self.out_y = y + 15
         self.value = value
+        self.oval = None
+        self.oval1 = None
+        self.text = None
 
     def paint(self):
-        canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
-        canvas.create_oval(self.x - 4, self.y + 15 - 4, self.x + 4, self.y + 15 + 4, fill="black", outline="black")
+        self.oval = canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
+        self.oval1 = canvas.create_oval(self.x - 4, self.y + 15 - 4, self.x + 4, self.y + 15 + 4, fill="black", outline="black")
         if self.value == "Start":
-            canvas.create_text(self.x, self.y, text="S" + str(START.count(-1)))
+            self.text = canvas.create_text(self.x, self.y, text="S" + str(START.count(-1)))
         else:
-            canvas.create_text(self.x, self.y, text=self.value)
+            self.text = canvas.create_text(self.x, self.y, text=self.value)
+
+    def delete(self):
+        canvas.delete(self.oval)
+        canvas.delete(self.oval1)
+        canvas.delete(self.text)
+
+    def rename(self, ind):
+        canvas.delete(self.text)
+        self.text = canvas.create_text(self.x, self.y, text="S" + str(ind))
 
 
 class Finish_versh:
@@ -110,11 +141,23 @@ class Finish_versh:
         self.in_x = x
         self.in_y = y - 15
         self.check = False
+        self.oval = None
+        self.oval1 = None
+        self.text = None
 
     def paint(self):
-        canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
-        canvas.create_oval(self.x - 4, self.y - 15 - 4, self.x + 4, self.y - 15 + 4, fill="black", outline="black")
-        canvas.create_text(self.x, self.y, text="F" + str(len(FINALL_LIST)))
+        self.oval = canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
+        self.oval1 = canvas.create_oval(self.x - 4, self.y - 15 - 4, self.x + 4, self.y - 15 + 4, fill="black", outline="black")
+        self.text = canvas.create_text(self.x, self.y, text="F" + str(len(FINALL_LIST)))
+
+    def delete(self):
+        canvas.delete(self.oval)
+        canvas.delete(self.oval1)
+        canvas.delete(self.text)
+
+    def rename(self, ind):
+        canvas.delete(self.text)
+        self.text = canvas.create_text(self.x, self.y, text="F" + str(ind))
 
 
 class NO_versh:
@@ -127,14 +170,24 @@ class NO_versh:
         self.out_y = y + 15
         self.value = None
         self.check = False
+        self.line = None
+        self.oval = None
+        self.oval1 = None
+        self.text = None
 
     def paint(self):
-        canvas.create_line(self.x - 15, self.y - 15, self.x + 15, self.y - 15, self.x, self.y + 15, self.x - 15,
-                           self.y - 15)
+        self.line = canvas.create_line(self.x - 15, self.y - 15, self.x + 15, self.y - 15, self.x, self.y + 15, self.x - 15,
+                                       self.y - 15)
         # canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
-        canvas.create_oval(self.x - 4, self.y - 15 - 4, self.x + 4, self.y - 15 + 4, fill="black", outline="black")
-        canvas.create_oval(self.x - 4, self.y + 15 - 4, self.x + 4, self.y + 15 + 4, fill="black", outline="black")
-        canvas.create_text(self.x, self.y - 10, text="__")
+        self.oval = canvas.create_oval(self.x - 4, self.y - 15 - 4, self.x + 4, self.y - 15 + 4, fill="black", outline="black")
+        self.oval1 = canvas.create_oval(self.x - 4, self.y + 15 - 4, self.x + 4, self.y + 15 + 4, fill="black", outline="black")
+        self.text = canvas.create_text(self.x, self.y - 10, text="__")
+
+    def delete(self):
+        canvas.delete(self.line)
+        canvas.delete(self.oval)
+        canvas.delete(self.oval1)
+        canvas.delete(self.text)
 
 
 def check_versh(x, y, flag):
@@ -314,13 +367,80 @@ def paint(event):
             if (event.x - sr_x) ** 2 + (event.y - sr_y) ** 2 <= 16:
                 DEE = ee
                 break
+        ind = None
+        for i in range(len(ALL_TRANSISTIR)):
+            if (event.x - ALL_TRANSISTIR[i][-1].x) ** 2 + (event.y - ALL_TRANSISTIR[i][-1].y) ** 2 <= 16:
+                DEE = ALL_TRANSISTIR[i][-1]
+                ind = i
+                break
         if DEE is None:
             return
-        delete_edge(DEE)
+        if type(DEE) == func_edge:
+            delete_edge(DEE)
+        else:
+            delete_vertex(DEE, ind)
+            DEE.delete()
+
+
+def delete_vertex(DEE, ind):
+    global EDGE_ELEMENT, ALL_TRANSISTIR, EDGE, VERSH, RED_DEL, START, START_LIST
+    canvas.delete(RED_DEL[len(EDGE_ELEMENT) + ind])
+    del RED_DEL[len(EDGE_ELEMENT) + ind]
+    if type(DEE) == Start_versh:
+        while True:
+            flag = 0
+            for ee in EDGE_ELEMENT:
+                if (ee.out_x - DEE.out_x)**2 + (ee.out_y - DEE.out_y)**2 <= 16:
+                    delete_edge(ee)
+                    flag = 1
+            if flag == 0:
+                break
+        for e in EDGE:
+            if ind in e:
+                e.remove(ind)
+        del ALL_TRANSISTIR[ind]
+        del VERSH[ind]
+        del EDGE[ind]
+        del START[START_LIST.index(DEE)]
+        START_LIST.remove(DEE)
+        for sl in range(len(START_LIST)):
+            START_LIST[sl].rename(sl + 1)
+        i = 0
+        for ver in VERSH:
+            if ver[0] == 3:
+                ver[1] = i
+                i += 1
+    if type(DEE) == Finish_versh:
+        for e in EDGE[ind]:
+            for ee in EDGE_ELEMENT:
+                if (ee.in_x - DEE.in_x)**2 + (ee.in_y - DEE.in_y)**2 <= 16:
+                    delete_edge(ee)
+        del ALL_TRANSISTIR[ind]
+        del VERSH[ind]
+        del EDGE[ind]
+        del FINALL[FINALL_LIST.index(DEE)]
+        FINALL_LIST.remove(DEE)
+        for fl in range(len(FINALL_LIST)):
+            FINALL_LIST[fl].rename(fl + 1)
+        for fl in range(len(FINALL_LIST)):
+            for i in range(len(ALL_TRANSISTIR)):
+                if ALL_TRANSISTIR[i][-1] == FINALL_LIST[fl]:
+                    FINALL[fl] = i
+    if type(DEE) == func_versh_3:
+        pass
+    if type(DEE) == NO_versh:
+        pass
+    for ed in range(len(EDGE)):
+        for i in range(len(EDGE[ed])):
+            if EDGE[ed][i] > ind:
+                EDGE[ed][i] -= 1
+    for f in range(len(FINALL)):
+        if FINALL[f] >ind:
+            FINALL[f] -= 1
 
 
 def delete_edge(DEE):
-    global EDGE_ELEMENT, ALL_TRANSISTIR, EDGE
+    global EDGE_ELEMENT, ALL_TRANSISTIR, EDGE, RED_DEL
     canvas.delete(RED_DEL[EDGE_ELEMENT.index(DEE)])
     FEO = check_versh(DEE.out_x, DEE.out_y, 2)
     FEI = check_versh(DEE.in_x, DEE.in_y, 2)
@@ -336,7 +456,7 @@ def delete_edge(DEE):
     for i in range(len(ALL_TRANSISTIR)):
         if ALL_TRANSISTIR[i][-1] == FEI:
             ind2 = i
-    if ind1 is not None and ind2 is not None:
+    if ind1 is not None and ind2 is not None and ind1 in EDGE[ind2]:
         EDGE[ind2].remove(ind1)
     del RED_DEL[EDGE_ELEMENT.index(DEE)]
     EDGE_ELEMENT.remove(DEE)
@@ -421,7 +541,7 @@ def CREATE(event):
             result.append([TS, calculate_finish_sign(TS, FINALL, VERSH, EDGE)])
     except:
         result = None
-    if result is not None:
+    if result is not None and result[0][1] != []:
         if len(result) == 1:
             lFINISH.config(text=result[0][1])
         else:

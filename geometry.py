@@ -1,7 +1,7 @@
 from math import *
 
 
-def calculate_cursor_points(x_start, y_start, x_finish, y_finish, arrowhead_len=5, angle=40):
+def calculate_cursor_points(x_start, y_start, x_finish, y_finish, arrowhead_len=8, angle=40):
     x = x_finish - x_start
     y = -y_finish - (-y_start)
     norm_vec = sqrt(x * x + y * y)
