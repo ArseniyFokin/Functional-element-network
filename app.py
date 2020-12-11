@@ -259,6 +259,8 @@ def back_line():
 
 def paint(event):
     global BUFFER_X, BUFFER_Y, BUFFER_TIP, v
+    bCREATESTART['state'] = DISABLED
+    bCREATE.grid_remove()
     if not FUNCELEMENT:
         return
     elif FUNCELEMENT != "EDGE" and BUFFER_X is not None and BUFFER_Y is not None:
@@ -327,6 +329,14 @@ def paint(event):
                     EDGE[in1].append(in2)
                 EDGE_ELEMENT.append(a)
                 a.draw()
+                try:
+                    result = calculate_finish_sign([0] * len(START), FINALL, VERSH, EDGE)
+                    if result is None or result == []:
+                        bCREATESTART['state'] = DISABLED
+                    else:
+                        bCREATESTART['state'] = NORMAL
+                except:
+                    bCREATESTART['state'] = DISABLED
         BUFFER_X = None
         BUFFER_Y = None
         BUFFER_TIP = None
@@ -564,7 +574,12 @@ def CREATE(event):
             result.append([TS, calculate_finish_sign(TS, FINALL, VERSH, EDGE)])
     except:
         result = None
-    if result is not None and result[0][1] != []:
+    flag = 1
+    if result is not None:
+        for r in result:
+            if not r[1]:
+                flag = 0
+    if result is not None and flag:
         if len(result) == 1:
             lFINISH.config(text=result[0][1])
         else:
@@ -585,6 +600,8 @@ def CREATE(event):
 
 
 def fSTART(event):
+    if bCREATESTART['state'] == DISABLED:
+        return
     global TEMP_START
     Temp_text = "".join(i for i in lSTART.get() if i == '1' or i == '0' or i == '?')
     TEMP_START = [str(START[i]) for i in range(len(START))]
@@ -623,6 +640,8 @@ def CLEAR(event):
     EDGE = []
     FINALL = []
     canvas.delete("all")
+    bCREATESTART['state'] = DISABLED
+    bCREATE.grid_remove()
 
 
 root = Tk()
@@ -647,7 +666,7 @@ bCLEAR = Button(text="Очистить поле", command=None)
 lSTART = Entry()
 lFINISH = Label(bg='#ffffff')
 LabelFinish = Label(text="          Finish:          ", anchor="center")
-bCREATESTART = Button(text="Задать Start", command=None)
+bCREATESTART = Button(root, text="Задать Start", command=None, state=DISABLED)
 
 bAND.grid(row=0, column=0, sticky=N + S + W + E)
 bOR.grid(row=0, column=1, sticky=N + S + W + E)
