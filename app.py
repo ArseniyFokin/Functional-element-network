@@ -382,22 +382,36 @@ def paint(event):
             DEE.delete()
 
 
+def delete_out(DEE, ind, x, y):
+    global EDGE_ELEMENT, EDGE
+    while True:
+        flag = 0
+        for ee in EDGE_ELEMENT:
+            if (ee.out_x - x) ** 2 + (ee.out_y - y) ** 2 <= 16:
+                delete_edge(ee)
+                flag = 1
+        if flag == 0:
+            break
+    for e in EDGE:
+        if ind in e:
+            e.remove(ind)
+
+
+def delete_in(DEE, ind, x, y):
+    global EDGE, EDGE_ELEMENT
+    for e in EDGE[ind]:
+        for ee in EDGE_ELEMENT:
+            if (ee.in_x - x) ** 2 + (ee.in_y - y) ** 2 <= 16:
+                delete_edge(ee)
+
+
 def delete_vertex(DEE, ind):
     global EDGE_ELEMENT, ALL_TRANSISTIR, EDGE, VERSH, RED_DEL, START, START_LIST
     canvas.delete(RED_DEL[len(EDGE_ELEMENT) + ind])
     del RED_DEL[len(EDGE_ELEMENT) + ind]
+    # Удаление стартовых вершин
     if type(DEE) == Start_versh:
-        while True:
-            flag = 0
-            for ee in EDGE_ELEMENT:
-                if (ee.out_x - DEE.out_x)**2 + (ee.out_y - DEE.out_y)**2 <= 16:
-                    delete_edge(ee)
-                    flag = 1
-            if flag == 0:
-                break
-        for e in EDGE:
-            if ind in e:
-                e.remove(ind)
+        delete_out(DEE, ind, DEE.out_x, DEE.out_y)
         del ALL_TRANSISTIR[ind]
         del VERSH[ind]
         del EDGE[ind]
@@ -410,11 +424,9 @@ def delete_vertex(DEE, ind):
             if ver[0] == 3:
                 ver[1] = i
                 i += 1
+    # Удаление финальных вершин
     if type(DEE) == Finish_versh:
-        for e in EDGE[ind]:
-            for ee in EDGE_ELEMENT:
-                if (ee.in_x - DEE.in_x)**2 + (ee.in_y - DEE.in_y)**2 <= 16:
-                    delete_edge(ee)
+        delete_in(DEE, ind, DEE.in_x, DEE.in_y)
         del ALL_TRANSISTIR[ind]
         del VERSH[ind]
         del EDGE[ind]
@@ -427,15 +439,26 @@ def delete_vertex(DEE, ind):
                 if ALL_TRANSISTIR[i][-1] == FINALL_LIST[fl]:
                     FINALL[fl] = i
     if type(DEE) == func_versh_3:
-        pass
+        delete_out(DEE, ind, DEE.in3_x, DEE.in3_y)
+        delete_in(DEE, ind, DEE.in1_x, DEE.in1_y)
+        delete_in(DEE, ind, DEE.in2_x, DEE.in2_y)
+        del ALL_TRANSISTIR[ind]
+        del VERSH[ind]
+        del EDGE[ind]
+        FUNCTIONAL_ELEMENT.remove(DEE)
     if type(DEE) == NO_versh:
-        pass
+        delete_out(DEE, ind, DEE.out_x, DEE.out_y)
+        delete_in(DEE, ind, DEE.in_x, DEE.in_y)
+        del ALL_TRANSISTIR[ind]
+        del VERSH[ind]
+        del EDGE[ind]
+        NO_ELEMENT.remove(DEE)
     for ed in range(len(EDGE)):
         for i in range(len(EDGE[ed])):
             if EDGE[ed][i] > ind:
                 EDGE[ed][i] -= 1
     for f in range(len(FINALL)):
-        if FINALL[f] >ind:
+        if FINALL[f] > ind:
             FINALL[f] -= 1
 
 
@@ -655,8 +678,8 @@ bONE.bind("<Button-1>", BUTTON)
 bZERO.bind("<Button-1>", BUTTON)
 bDEL.bind("<Button-1>", DEL)
 bCREATE.bind("<Button-1>", CREATE)
-bCHECK.bind("<Button-1>", TEST)
-# bCHECK.bind("<Button-1>", INFO)
+# bCHECK.bind("<Button-1>", TEST)
+bCHECK.bind("<Button-1>", INFO)
 bCLEAR.bind("<Button-1>", CLEAR)
 bCREATESTART.bind("<Button-1>", fSTART)
 canvas.bind("<Button-1>", paint)
