@@ -36,7 +36,7 @@ def calculate_cursor_points(x_start, y_start, x_finish, y_finish, arrowhead_len=
     return a
 
 
-def shift_point(x_start, y_start, x_finish, y_finish, shift_len=10):
+def shift_point(x_start, y_start, x_finish, y_finish, shift_len=4):
     x = x_finish - x_start
     y = -y_finish - (-y_start)
     norm_vec = sqrt(x * x + y * y)

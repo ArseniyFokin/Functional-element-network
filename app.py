@@ -592,7 +592,7 @@ def CREATE(event):
     try:
         for TS in generate_bit_set(TEMP_START):
             TS = list(map(int, TS))
-            result.append([TS, calculate_finish_sign(TS, FINALL, VERSH, EDGE)])
+            result.append([[TS[i] for i in range(len(START)) if START[i] == -1], calculate_finish_sign(TS, FINALL, VERSH, EDGE)])
     except:
         result = None
     flag = 1
@@ -613,7 +613,7 @@ def CREATE(event):
             Temp_windows.minsize(200, 200)
             Temp_windows.title('Finish')
             Temp_finish_label = Label(Temp_windows, bg='#ffffff', bd=0)
-            text = "mask: " + "".join(TEMP_START) + "\n"
+            text = "mask: " + "".join([TEMP_START[i] for i in range(len(START)) if START[i] == -1]) + "\n"
             for i in result:
                 text += ("".join(map(str, i[0])) + " -> " + "".join(map(str, i[1])) + "\n")
             Temp_finish_label.configure(text=text, anchor="center", font="Arial 14")
