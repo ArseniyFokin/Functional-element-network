@@ -130,8 +130,9 @@ class Start_versh:
         canvas.delete(self.text)
 
     def rename(self, ind):
-        canvas.delete(self.text)
-        self.text = canvas.create_text(self.x, self.y, text="S" + str(ind))
+        if self.value != "0" and self.value != "1":
+            canvas.delete(self.text)
+            self.text = canvas.create_text(self.x, self.y, text="S" + str(ind))
 
 
 class Finish_versh:
@@ -427,8 +428,10 @@ def delete_vertex(DEE, ind):
         del EDGE[ind]
         del START[START_LIST.index(DEE)]
         START_LIST.remove(DEE)
+        i = 0
         for sl in range(len(START_LIST)):
-            START_LIST[sl].rename(sl + 1)
+            START_LIST[sl].rename(i + 1)
+            i += 1
         i = 0
         for ver in VERSH:
             if ver[0] == 3:
