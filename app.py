@@ -332,7 +332,12 @@ def paint(event):
                 a.draw()
                 try:
                     result = calculate_finish_sign([0] * len(START), FINALL, VERSH, EDGE)
-                    if result is None or result == []:
+                    flag = 1
+                    if result is not None:
+                        for r in result:
+                            if r is None:
+                                flag = 0
+                    if result is None or result == [] or not flag:
                         bCREATESTART['state'] = DISABLED
                     else:
                         bCREATESTART['state'] = NORMAL
@@ -391,6 +396,19 @@ def paint(event):
         else:
             delete_vertex(DEE, ind)
             DEE.delete()
+        try:
+            result = calculate_finish_sign([0] * len(START), FINALL, VERSH, EDGE)
+            flag = 1
+            if result is not None:
+                for r in result:
+                    if r is None:
+                        flag = 0
+            if result is None or result == [] or not flag:
+                bCREATESTART['state'] = DISABLED
+            else:
+                bCREATESTART['state'] = NORMAL
+        except:
+            bCREATESTART['state'] = DISABLED
 
 
 def delete_out(DEE, ind, x, y):
@@ -582,6 +600,9 @@ def CREATE(event):
         for r in result:
             if not r[1]:
                 flag = 0
+            for j in r[1]:
+                if j is None:
+                    flag = 0
     if result is not None and flag:
         if len(result) == 1:
             lFINISH.config(text=result[0][1])

@@ -11,7 +11,7 @@ def calculate_finish_sign(start, finish, vertex, edges):
         cur_depth = 0
         try:
             f = calculate_finish_point(i, start, vertex, edges, vertex_sign)
-        except():
+        except:
             f = None
         ans.append(f)
     return ans
@@ -40,12 +40,16 @@ def calculate_finish_point(s, start, vertex, edges, vertex_sign):
         if vertex_sign[s] == -1:
             vertex_sign[s] = int(calculate_finish_point(edges[s][0], start, vertex, edges, vertex_sign) or
                                  calculate_finish_point(edges[s][1], start, vertex, edges, vertex_sign))
+        if calculate_finish_point(edges[s][1], start, vertex, edges, vertex_sign) is None:
+            vertex_sign[s] = None
         return vertex_sign[s]
     elif vertex[s][0] == 6:
         cur_depth = cur_depth + 1
         if vertex_sign[s] == -1:
             vertex_sign[s] = int(calculate_finish_point(edges[s][0], start, vertex, edges, vertex_sign) and
                                  calculate_finish_point(edges[s][1], start, vertex, edges, vertex_sign))
+        if calculate_finish_point(edges[s][1], start, vertex, edges, vertex_sign) is None:
+            vertex_sign[s] = None
         return vertex_sign[s]
     elif vertex[s][0] == 7:
         cur_depth = cur_depth + 1
