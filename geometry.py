@@ -34,3 +34,17 @@ def calculate_cursor_points(x_start, y_start, x_finish, y_finish, arrowhead_len=
     a.append(-y1_new_point_second)
 
     return a
+
+
+def shift_point(x_start, y_start, x_finish, y_finish, shift_len=10):
+    x = x_finish - x_start
+    y = -y_finish - (-y_start)
+    norm_vec = sqrt(x * x + y * y)
+
+    x_found = x_finish
+    y_found = -y_finish
+
+    x_new_point = (x / norm_vec) * shift_len + x_found
+    y_new_point = (y / norm_vec) * shift_len + y_found
+
+    return [x_new_point, -y_new_point]
