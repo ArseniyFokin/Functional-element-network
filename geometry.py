@@ -44,7 +44,7 @@ def shift_point(x_start, y_start, x_finish, y_finish, shift_len=4):
     x_found = x_finish
     y_found = -y_finish
 
-    x_new_point = (x / norm_vec) * shift_len + x_found
-    y_new_point = (y / norm_vec) * shift_len + y_found
+    x_new_point = -(x / norm_vec) * shift_len + x_found
+    y_new_point = -(y / norm_vec) * shift_len + y_found
 
     return [x_new_point, -y_new_point]

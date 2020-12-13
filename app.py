@@ -1,7 +1,7 @@
 from tkinter import *
 
 from calculator import calculate_finish_sign, generate_bit_set
-from geometry import calculate_cursor_points
+from geometry import calculate_cursor_points, shift_point
 
 canvas_width = 700
 canvas_height = 500
@@ -66,6 +66,12 @@ class func_versh_3:
             self.check_in1 = True
         elif (x - self.in2_x) ** 2 + (y - self.in2_y) ** 2 <= 16:
             self.check_in2 = True
+    
+    def select_in(self, x, y):
+        if (x - self.in1_x) ** 2 + (y - self.in1_y) ** 2 <= 16:
+            return self.in1_x, self.in1_y
+        elif (x - self.in2_x) ** 2 + (y - self.in2_y) ** 2 <= 16:
+            return self.in2_x, self.in2_y
 
     def in_False(self, x, y):
         if (x - self.in1_x) ** 2 + (y - self.in1_y) ** 2 <= 16:
@@ -93,11 +99,12 @@ class func_edge:
         self.line1 = None
         self.line2 = None
 
-    def draw(self):
-        self.line = canvas.create_line(self.in_x, self.in_y, self.out_x, self.out_y)
-        x1, y1, x2, y2 = calculate_cursor_points(self.out_x, self.out_y, self.in_x, self.in_y)
-        self.line1 = canvas.create_line(self.in_x, self.in_y, x1, y1, width=2)
-        self.line2 = canvas.create_line(self.in_x, self.in_y, x2, y2, width=2)
+    def draw(self, x, y):
+        x_new, y_new = shift_point(self.out_x, self.out_y, x, y)
+        self.line = canvas.create_line(x_new, y_new, self.out_x, self.out_y)
+        x1, y1, x2, y2 = calculate_cursor_points(self.out_x, self.out_y, x_new, y_new)
+        self.line1 = canvas.create_line(x_new, y_new, x1, y1, width=2)
+        self.line2 = canvas.create_line(x_new, y_new, x2, y2, width=2)
 
     def delete(self):
         canvas.delete(self.line)
@@ -329,7 +336,16 @@ def paint(event):
                 else:
                     EDGE[in1].append(in2)
                 EDGE_ELEMENT.append(a)
-                a.draw()
+                if flag:
+                    if type(class2) == func_versh_3:
+                        a.draw(*class2.select_in(event.x, event.y))
+                    else:
+                        a.draw(class2.in_x, class2.in_y)
+                else:
+                    if type(class1) == func_versh_3:
+                        a.draw(*class1.select_in(BUFFER_X, BUFFER_Y))
+                    else:
+                        a.draw(class1.in_x, class1.in_y)
                 try:
                     result = calculate_finish_sign([0] * len(START), FINALL, VERSH, EDGE)
                     flag = 1
@@ -683,8 +699,8 @@ bSTART = Button(text="Start", command=None)
 bFINISH = Button(text="Finish", command=None)
 bONE = Button(text="0", command=None)
 bZERO = Button(text="1", command=None)
-bDEL = Button(text="Удаление", command=None)
-bCREATE = Button(text="Построить", command=None)
+bDEL = Button(text="Удалить", command=None)
+bCREATE = Button(text="Посчитать", command=None)
 bCHECK = Button(text="Информация", command=None)
 bCLEAR = Button(text="Очистить поле", command=None)
 lSTART = Entry()
