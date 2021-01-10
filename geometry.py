@@ -1,4 +1,4 @@
-from math import *
+from math import sin, cos, sqrt, pi
 
 
 def calculate_cursor_points(x_start, y_start, x_finish, y_finish, arrowhead_len=8, angle=40):
