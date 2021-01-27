@@ -1,13 +1,8 @@
-from tkinter import *
-
 from calculator import calculate_finish_sign, generate_bit_set
-from geometry import calculate_cursor_points, shift_point
+from fe_classes import *
+from win_global import *
 
-canvas_width = 700
-canvas_height = 500
-brush_size = 3
-brush_color = "black"
-FUNCELEMENT = None
+FUNC_ELEMENT = None
 BUFFER_X = None
 BUFFER_Y = None
 BUFFER_TIP = None
@@ -17,188 +12,31 @@ RED_DEL = list()
 FUNCTIONAL_ELEMENT = list()
 EDGE_ELEMENT = list()
 START_LIST = list()
-FINALL_LIST = list()
+FINAL_LIST = list()
 NO_ELEMENT = list()
-ALL_TRANSISTIR = list()
+ALL_TRANSISTOR = list()
 TEMP_START = []
 START = []  # Массив стартовых состояний
 EDGE = []  # Массив всех рёбер
-VERSH = []  # Массив всех вершин
-FINALL = []  # Массив финальных состояний
+VERTEX = []  # Массив всех вершин
+FINAL = []  # Массив финальных состояний
 
-
-class func_versh_3:
-    def __init__(self, view, x, y):
-        self.x = x
-        self.y = y
-        self.in1_x = x - 15
-        self.in1_y = y - 15
-        self.in2_x = x + 15
-        self.in2_y = y - 15
-        self.in3_x = x
-        self.in3_y = y + 15
-        self.view = view
-        self.fill = "green" if view == "AND" else "red"
-        self.check_in1 = False
-        self.check_in2 = False
-        self.line = None
-        self.oval = None
-        self.oval1 = None
-        self.oval2 = None
-        self.text = None
-
-    def draw(self):
-        self.line = canvas.create_line(self.in1_x, self.in1_y, self.in2_x, self.in2_y, self.in3_x, self.in3_y,
-                                       self.in1_x, self.in1_y, fill=self.fill)
-        self.oval = canvas.create_oval(self.in1_x - 4, self.in1_y - 4, self.in1_x + 4, self.in1_y + 4, fill="black",
-                                       outline="black")
-        self.oval1 = canvas.create_oval(self.in2_x - 4, self.in2_y - 4, self.in2_x + 4, self.in2_y + 4, fill="black",
-                                        outline="black")
-        self.oval2 = canvas.create_oval(self.in3_x - 4, self.in3_y - 4, self.in3_x + 4, self.in3_y + 4, fill="black",
-                                        outline="black")
-        if self.view == "AND":
-            self.text = canvas.create_text(self.x, self.y - 5, text="Λ")
-        else:
-            self.text = canvas.create_text(self.x, self.y - 5, text="v")
-
-    def check_in(self, x, y):
-        if (x - self.in1_x) ** 2 + (y - self.in1_y) ** 2 <= 16:
-            self.check_in1 = True
-        elif (x - self.in2_x) ** 2 + (y - self.in2_y) ** 2 <= 16:
-            self.check_in2 = True
-    
-    def select_in(self, x, y):
-        if (x - self.in1_x) ** 2 + (y - self.in1_y) ** 2 <= 16:
-            return self.in1_x, self.in1_y
-        elif (x - self.in2_x) ** 2 + (y - self.in2_y) ** 2 <= 16:
-            return self.in2_x, self.in2_y
-
-    def in_False(self, x, y):
-        if (x - self.in1_x) ** 2 + (y - self.in1_y) ** 2 <= 16:
-            self.check_in1 = False
-        elif (x - self.in2_x) ** 2 + (y - self.in2_y) ** 2 <= 16:
-            self.check_in2 = False
-
-    def delete(self):
-        canvas.delete(self.line)
-        canvas.delete(self.oval)
-        canvas.delete(self.oval1)
-        canvas.delete(self.oval2)
-        canvas.delete(self.text)
-
-
-class func_edge:
-    def __init__(self, in_x, in_y, out_x, out_y, class1, class2):
-        self.in_x = in_x
-        self.in_y = in_y
-        self.out_x = out_x
-        self.out_y = out_y
-        self.class1 = class1
-        self.class2 = class2
-        self.line = None
-        self.line1 = None
-        self.line2 = None
-
-    def draw(self, x, y):
-        x_new, y_new = shift_point(self.out_x, self.out_y, x, y)
-        self.line = canvas.create_line(x_new, y_new, self.out_x, self.out_y)
-        x1, y1, x2, y2 = calculate_cursor_points(self.out_x, self.out_y, x_new, y_new)
-        self.line1 = canvas.create_line(x_new, y_new, x1, y1, width=2)
-        self.line2 = canvas.create_line(x_new, y_new, x2, y2, width=2)
-
-    def delete(self):
-        canvas.delete(self.line)
-        canvas.delete(self.line1)
-        canvas.delete(self.line2)
-
-
-class Start_versh:
-    def __init__(self, x, y, value):
-        self.x = x
-        self.y = y
-        self.out_x = x
-        self.out_y = y + 15
-        self.value = value
-        self.oval = None
-        self.oval1 = None
-        self.text = None
-
-    def paint(self):
-        self.oval = canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
-        self.oval1 = canvas.create_oval(self.x - 4, self.y + 15 - 4, self.x + 4, self.y + 15 + 4, fill="black", outline="black")
-        if self.value == "Start":
-            self.text = canvas.create_text(self.x, self.y, text="S" + str(START.count(-1)))
-        else:
-            self.text = canvas.create_text(self.x, self.y, text=self.value)
-
-    def delete(self):
-        canvas.delete(self.oval)
-        canvas.delete(self.oval1)
-        canvas.delete(self.text)
-
-    def rename(self, ind):
-        if self.value != "0" and self.value != "1":
-            canvas.delete(self.text)
-            self.text = canvas.create_text(self.x, self.y, text="S" + str(ind))
-
-
-class Finish_versh:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.in_x = x
-        self.in_y = y - 15
-        self.check = False
-        self.oval = None
-        self.oval1 = None
-        self.text = None
-
-    def paint(self):
-        self.oval = canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
-        self.oval1 = canvas.create_oval(self.x - 4, self.y - 15 - 4, self.x + 4, self.y - 15 + 4, fill="black", outline="black")
-        self.text = canvas.create_text(self.x, self.y, text="F" + str(len(FINALL_LIST)))
-
-    def delete(self):
-        canvas.delete(self.oval)
-        canvas.delete(self.oval1)
-        canvas.delete(self.text)
-
-    def rename(self, ind):
-        canvas.delete(self.text)
-        self.text = canvas.create_text(self.x, self.y, text="F" + str(ind))
-
-
-class NO_versh:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.in_x = x
-        self.in_y = y - 15
-        self.out_x = x
-        self.out_y = y + 15
-        self.value = None
-        self.check = False
-        self.line = None
-        self.oval = None
-        self.oval1 = None
-        self.text = None
-
-    def paint(self):
-        self.line = canvas.create_line(self.x - 15, self.y - 15, self.x + 15, self.y - 15, self.x, self.y + 15, self.x - 15,
-                                       self.y - 15)
-        # canvas.create_oval(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
-        self.oval = canvas.create_oval(self.x - 4, self.y - 15 - 4, self.x + 4, self.y - 15 + 4, fill="black", outline="black")
-        self.oval1 = canvas.create_oval(self.x - 4, self.y + 15 - 4, self.x + 4, self.y + 15 + 4, fill="black", outline="black")
-        self.text = canvas.create_text(self.x, self.y - 10, text="__")
-
-    def delete(self):
-        canvas.delete(self.line)
-        canvas.delete(self.oval)
-        canvas.delete(self.oval1)
-        canvas.delete(self.text)
-
-
-def check_versh(x, y, flag):
+def check_vertex(x, y, flag):
+    """
+    Возвращает ФЭ, которой принадлежит точка (x, y)
+    :param x: Координата x
+    :param y: Координата y
+    :param flag: Тип операции
+    1 - Меняет BUFFER_TIP:
+        1 - Вход AND, OR
+        2 - Выход AND, OR
+        3 - Выход START
+        4 - Вход FINISH
+        5 - Вход NO
+        6 - Выход NO
+    2 - Не меняет BUFFER_TIP
+    :return: ФЭ
+    """
     global BUFFER_TIP
     for FE in FUNCTIONAL_ELEMENT:
         if (x - FE.in1_x) ** 2 + (y - FE.in1_y) ** 2 <= 16:
@@ -217,7 +55,7 @@ def check_versh(x, y, flag):
             if flag == 2:
                 return FE
     for FE in FUNCTIONAL_ELEMENT:
-        if (x - FE.in3_x) ** 2 + (y - FE.in3_y) ** 2 <= 16:
+        if (x - FE.out_x) ** 2 + (y - FE.out_y) ** 2 <= 16:
             if flag == 1:
                 BUFFER_TIP = 2
             return FE
@@ -226,7 +64,7 @@ def check_versh(x, y, flag):
             if flag == 1:
                 BUFFER_TIP = 3
             return SL
-    for FL in FINALL_LIST:
+    for FL in FINAL_LIST:
         if (x - FL.in_x) ** 2 + (y - FL.in_y) ** 2 <= 16:
             if not FL.check:
                 if flag == 1:
@@ -251,6 +89,15 @@ def check_versh(x, y, flag):
 
 
 def check_edge():
+    """
+    Проверяет BUFFER_TIP на вход
+    BUFFER_TIP == 1 - Вход AND, OR
+    BUFFER_TIP == 4 - Вход FINAL
+    BUFFER_TIP == 5 - Вход NO
+    :return:
+    True - Вход
+    False - Выход
+    """
     global BUFFER_TIP
     if BUFFER_TIP == 1 or BUFFER_TIP == 4 or BUFFER_TIP == 5:
         return True
@@ -258,6 +105,7 @@ def check_edge():
 
 
 def back_line():
+    """Отменяет ребро"""
     global BUFFER_X, BUFFER_Y, BUFFER_TIP
     BUFFER_X = None
     BUFFER_Y = None
@@ -266,39 +114,50 @@ def back_line():
 
 
 def paint(event):
+    """Рисует ФЭ"""
     global BUFFER_X, BUFFER_Y, BUFFER_TIP, v
-    bCREATESTART['state'] = DISABLED
+    bCREATE_START['state'] = DISABLED
     bCREATE.grid_remove()
-    if not FUNCELEMENT:
+    if not FUNC_ELEMENT:
         return
-    elif FUNCELEMENT != "EDGE" and BUFFER_X is not None and BUFFER_Y is not None:
+
+    # Первая точка ребра поставлена, но кнопка EDGE отжата
+    elif FUNC_ELEMENT != "EDGE" and BUFFER_X is not None and BUFFER_Y is not None:
         BUFFER_X = None
         BUFFER_Y = None
-    elif FUNCELEMENT == "OR":
-        a = func_versh_3("OR", event.x, event.y)
+
+    # Кнопка OR
+    elif FUNC_ELEMENT == "OR":
+        a = func_vertex_3("OR", event.x, event.y)
         EDGE.append([])
-        ALL_TRANSISTIR.append([5, 5, a])
+        ALL_TRANSISTOR.append([5, 5, a])
         FUNCTIONAL_ELEMENT.append(a)
-        VERSH.append([5, 5])
+        VERTEX.append([5, 5])
         a.draw()
-    elif FUNCELEMENT == "AND":
-        a = func_versh_3("AND", event.x, event.y)
+
+    # Кнопка AND
+    elif FUNC_ELEMENT == "AND":
+        a = func_vertex_3("AND", event.x, event.y)
         EDGE.append([])
-        ALL_TRANSISTIR.append([6, 6, a])
+        ALL_TRANSISTOR.append([6, 6, a])
         FUNCTIONAL_ELEMENT.append(a)
-        VERSH.append([6, 6])
+        VERTEX.append([6, 6])
         a.draw()
-    elif FUNCELEMENT == "EDGE" and BUFFER_X is None and BUFFER_Y is None and BUFFER_TIP is None:
-        FE = check_versh(event.x, event.y, 1)
+
+    # Кнопка EDGE, первая точка
+    elif FUNC_ELEMENT == "EDGE" and BUFFER_X is None and BUFFER_Y is None and BUFFER_TIP is None:
+        FE = check_vertex(event.x, event.y, 1)
         if FE:
             BUFFER_X = event.x
             BUFFER_Y = event.y
             v = canvas.create_oval(50, 50, 75, 75, outline="#000000", fill="#00ff00")
-    elif FUNCELEMENT == "EDGE" and BUFFER_X is not None and BUFFER_Y is not None and BUFFER_TIP is not None:
+
+    # Кнопка EDGE, вторая точка
+    elif FUNC_ELEMENT == "EDGE" and BUFFER_X is not None and BUFFER_Y is not None and BUFFER_TIP is not None:
         tip = BUFFER_TIP
-        class1 = check_versh(BUFFER_X, BUFFER_Y, 1)
-        if check_versh(event.x, event.y, 0):
-            class2 = check_versh(event.x, event.y, 1)
+        class1 = check_vertex(BUFFER_X, BUFFER_Y, 1)
+        if check_vertex(event.x, event.y, 0):
+            class2 = check_vertex(event.x, event.y, 1)
             if BUFFER_TIP != tip and (class1.x != class2.x or class1.y != class2.y) and (
                     BUFFER_TIP != 3 or tip != 2) and (BUFFER_TIP != 2 or tip != 3) and (
                     BUFFER_TIP != 5 or tip != 1) and (BUFFER_TIP != 1 or tip != 5) and (
@@ -325,11 +184,11 @@ def paint(event):
                     a = func_edge(BUFFER_X, BUFFER_Y, event.x, event.y, class1, class2)
                 in1 = -1
                 in2 = -1
-                for i in range(len(ALL_TRANSISTIR)):
-                    if ALL_TRANSISTIR[i][-1] == class1:
+                for i in range(len(ALL_TRANSISTOR)):
+                    if ALL_TRANSISTOR[i][-1] == class1:
                         in1 = i
-                for i in range(len(ALL_TRANSISTIR)):
-                    if ALL_TRANSISTIR[i][-1] == class2:
+                for i in range(len(ALL_TRANSISTOR)):
+                    if ALL_TRANSISTOR[i][-1] == class2:
                         in2 = i
                 if flag:
                     EDGE[in2].append(in1)
@@ -337,61 +196,69 @@ def paint(event):
                     EDGE[in1].append(in2)
                 EDGE_ELEMENT.append(a)
                 if flag:
-                    if type(class2) == func_versh_3:
+                    if type(class2) == func_vertex_3:
                         a.draw(*class2.select_in(event.x, event.y))
                     else:
                         a.draw(class2.in_x, class2.in_y)
                 else:
-                    if type(class1) == func_versh_3:
+                    if type(class1) == func_vertex_3:
                         a.draw(*class1.select_in(BUFFER_X, BUFFER_Y))
                     else:
                         a.draw(class1.in_x, class1.in_y)
                 try:
-                    result = calculate_finish_sign([0] * len(START), FINALL, VERSH, EDGE)
+                    result = calculate_finish_sign([0] * len(START), FINAL, VERTEX, EDGE)
                     flag = 1
                     if result is not None:
                         for r in result:
                             if r is None:
                                 flag = 0
                     if result is None or result == [] or not flag:
-                        bCREATESTART['state'] = DISABLED
+                        bCREATE_START['state'] = DISABLED
                     else:
-                        bCREATESTART['state'] = NORMAL
+                        bCREATE_START['state'] = NORMAL
                 except:
-                    bCREATESTART['state'] = DISABLED
+                    bCREATE_START['state'] = DISABLED
         BUFFER_X = None
         BUFFER_Y = None
         BUFFER_TIP = None
         canvas.delete(v)
-    elif FUNCELEMENT == "Start" or FUNCELEMENT == "0" or FUNCELEMENT == "1":
-        a = Start_versh(event.x, event.y, FUNCELEMENT)
+
+    # Кнопка START
+    elif FUNC_ELEMENT == "Start" or FUNC_ELEMENT == "0" or FUNC_ELEMENT == "1":
+        a = Start_vertex(event.x, event.y, FUNC_ELEMENT, str(START.count(-1) + 1))
         EDGE.append([])
-        ALL_TRANSISTIR.append([3, len(START_LIST), a])
-        VERSH.append([3, len(START_LIST)])
+        ALL_TRANSISTOR.append([3, len(START_LIST), a])
+        VERTEX.append([3, len(START_LIST)])
         START_LIST.append(a)
-        if FUNCELEMENT == "Start":
+        if FUNC_ELEMENT == "Start":
             START.append(-1)
-        elif FUNCELEMENT == "1":
+        elif FUNC_ELEMENT == "1":
             START.append(1)
-        elif FUNCELEMENT == "0":
+        elif FUNC_ELEMENT == "0":
             START.append(0)
         a.paint()
-    elif FUNCELEMENT == "Finish":
-        a = Finish_versh(event.x, event.y)
-        FINALL.append(len(ALL_TRANSISTIR))
-        VERSH.append([7, 7])
-        FINALL_LIST.append(a)
+
+    # Кнопка FINISH
+    elif FUNC_ELEMENT == "Finish":
+        a = Finish_vertex(event.x, event.y, str(len(FINAL_LIST) + 1))
+        FINAL.append(len(ALL_TRANSISTOR))
+        VERTEX.append([7, 7])
+        FINAL_LIST.append(a)
         EDGE.append([])
-        ALL_TRANSISTIR.append([7, 7, a])
+        ALL_TRANSISTOR.append([7, 7, a])
         a.paint()
-    elif FUNCELEMENT == "NO":
-        a = NO_versh(event.x, event.y)
+
+    # Кнопка NO
+    elif FUNC_ELEMENT == "NO":
+        a = NO_vertex(event.x, event.y)
         EDGE.append([])
-        VERSH.append([4, 4])
+        VERTEX.append([4, 4])
         NO_ELEMENT.append(a)
-        ALL_TRANSISTIR.append([4, 4, a])
+        ALL_TRANSISTOR.append([4, 4, a])
         a.paint()
-    elif FUNCELEMENT == "DEL":
+
+    # Кнопка DEL ("Удалить")
+    elif FUNC_ELEMENT == "DEL":
         DEE = None
         for ee in EDGE_ELEMENT:
             sr_x = (ee.in_x + ee.out_x) // 2
@@ -400,9 +267,9 @@ def paint(event):
                 DEE = ee
                 break
         ind = None
-        for i in range(len(ALL_TRANSISTIR)):
-            if (event.x - ALL_TRANSISTIR[i][-1].x) ** 2 + (event.y - ALL_TRANSISTIR[i][-1].y) ** 2 <= 16:
-                DEE = ALL_TRANSISTIR[i][-1]
+        for i in range(len(ALL_TRANSISTOR)):
+            if (event.x - ALL_TRANSISTOR[i][-1].x) ** 2 + (event.y - ALL_TRANSISTOR[i][-1].y) ** 2 <= 16:
+                DEE = ALL_TRANSISTOR[i][-1]
                 ind = i
                 break
         if DEE is None:
@@ -413,21 +280,27 @@ def paint(event):
             delete_vertex(DEE, ind)
             DEE.delete()
         try:
-            result = calculate_finish_sign([0] * len(START), FINALL, VERSH, EDGE)
+            result = calculate_finish_sign([0] * len(START), FINAL, VERTEX, EDGE)
             flag = 1
             if result is not None:
                 for r in result:
                     if r is None:
                         flag = 0
             if result is None or result == [] or not flag:
-                bCREATESTART['state'] = DISABLED
+                bCREATE_START['state'] = DISABLED
             else:
-                bCREATESTART['state'] = NORMAL
+                bCREATE_START['state'] = NORMAL
         except:
-            bCREATESTART['state'] = DISABLED
+            bCREATE_START['state'] = DISABLED
 
 
-def delete_out(DEE, ind, x, y):
+def delete_out(ind, x, y):
+    """
+    Удаляет все рёбра, исходящие из ФЭ
+    :param ind: Номер ребра
+    :param x: Координа x центра выхода
+    :param y: Координата y центра выхода
+    """
     global EDGE_ELEMENT, EDGE
     while True:
         flag = 0
@@ -442,23 +315,35 @@ def delete_out(DEE, ind, x, y):
             e.remove(ind)
 
 
-def delete_in(DEE, ind, x, y):
+def delete_in(ind, x, y):
+    """
+    Удаляет все рёбра, входящие в ФЭ
+    :param ind: Номер ребра
+    :param x: Координа x центра входа
+    :param y: Координа y центра выхода
+    """
     global EDGE, EDGE_ELEMENT
-    for e in EDGE[ind]:
+    for _ in EDGE[ind]:
         for ee in EDGE_ELEMENT:
             if (ee.in_x - x) ** 2 + (ee.in_y - y) ** 2 <= 16:
                 delete_edge(ee)
 
 
 def delete_vertex(DEE, ind):
-    global EDGE_ELEMENT, ALL_TRANSISTIR, EDGE, VERSH, RED_DEL, START, START_LIST
+    """
+    Удаление ФЭ
+    :param DEE: ФЭ
+    :param ind: Индекс ФЭ
+    """
+    global EDGE_ELEMENT, ALL_TRANSISTOR, EDGE, VERTEX, RED_DEL, START, START_LIST
     canvas.delete(RED_DEL[len(EDGE_ELEMENT) + ind])
     del RED_DEL[len(EDGE_ELEMENT) + ind]
-    # Удаление стартовых вершин
-    if type(DEE) == Start_versh:
-        delete_out(DEE, ind, DEE.out_x, DEE.out_y)
-        del ALL_TRANSISTIR[ind]
-        del VERSH[ind]
+
+    # Удаление START ФЭ
+    if type(DEE) == Start_vertex:
+        delete_out(ind, DEE.out_x, DEE.out_y)
+        del ALL_TRANSISTOR[ind]
+        del VERTEX[ind]
         del EDGE[ind]
         del START[START_LIST.index(DEE)]
         START_LIST.remove(DEE)
@@ -467,64 +352,73 @@ def delete_vertex(DEE, ind):
             START_LIST[sl].rename(i + 1)
             i += 1
         i = 0
-        for ver in VERSH:
+        for ver in VERTEX:
             if ver[0] == 3:
                 ver[1] = i
                 i += 1
-    # Удаление финальных вершин
-    if type(DEE) == Finish_versh:
-        delete_in(DEE, ind, DEE.in_x, DEE.in_y)
-        del ALL_TRANSISTIR[ind]
-        del VERSH[ind]
+
+    # Удаление FINAL ФЭ
+    if type(DEE) == Finish_vertex:
+        delete_in(ind, DEE.in_x, DEE.in_y)
+        del ALL_TRANSISTOR[ind]
+        del VERTEX[ind]
         del EDGE[ind]
-        del FINALL[FINALL_LIST.index(DEE)]
-        FINALL_LIST.remove(DEE)
-        for fl in range(len(FINALL_LIST)):
-            FINALL_LIST[fl].rename(fl + 1)
-        for fl in range(len(FINALL_LIST)):
-            for i in range(len(ALL_TRANSISTIR)):
-                if ALL_TRANSISTIR[i][-1] == FINALL_LIST[fl]:
-                    FINALL[fl] = i
-    if type(DEE) == func_versh_3:
-        delete_out(DEE, ind, DEE.in3_x, DEE.in3_y)
-        delete_in(DEE, ind, DEE.in1_x, DEE.in1_y)
-        delete_in(DEE, ind, DEE.in2_x, DEE.in2_y)
-        del ALL_TRANSISTIR[ind]
-        del VERSH[ind]
+        del FINAL[FINAL_LIST.index(DEE)]
+        FINAL_LIST.remove(DEE)
+        for fl in range(len(FINAL_LIST)):
+            FINAL_LIST[fl].rename(fl + 1)
+        for fl in range(len(FINAL_LIST)):
+            for i in range(len(ALL_TRANSISTOR)):
+                if ALL_TRANSISTOR[i][-1] == FINAL_LIST[fl]:
+                    FINAL[fl] = i
+
+    # Удаление AND, OR ФЭ
+    if type(DEE) == func_vertex_3:
+        delete_out(ind, DEE.out_x, DEE.out_y)
+        delete_in(ind, DEE.in1_x, DEE.in1_y)
+        delete_in(ind, DEE.in2_x, DEE.in2_y)
+        del ALL_TRANSISTOR[ind]
+        del VERTEX[ind]
         del EDGE[ind]
         FUNCTIONAL_ELEMENT.remove(DEE)
-    if type(DEE) == NO_versh:
-        delete_out(DEE, ind, DEE.out_x, DEE.out_y)
-        delete_in(DEE, ind, DEE.in_x, DEE.in_y)
-        del ALL_TRANSISTIR[ind]
-        del VERSH[ind]
+
+    # Удаление NO ФЭ
+    if type(DEE) == NO_vertex:
+        delete_out(ind, DEE.out_x, DEE.out_y)
+        delete_in(ind, DEE.in_x, DEE.in_y)
+        del ALL_TRANSISTOR[ind]
+        del VERTEX[ind]
         del EDGE[ind]
         NO_ELEMENT.remove(DEE)
     for ed in range(len(EDGE)):
         for i in range(len(EDGE[ed])):
             if EDGE[ed][i] > ind:
                 EDGE[ed][i] -= 1
-    for f in range(len(FINALL)):
-        if FINALL[f] > ind:
-            FINALL[f] -= 1
+    for f in range(len(FINAL)):
+        if FINAL[f] > ind:
+            FINAL[f] -= 1
 
 
 def delete_edge(DEE):
-    global EDGE_ELEMENT, ALL_TRANSISTIR, EDGE, RED_DEL
+    """
+    Удаление
+    :param DEE: Ребро
+    """
+    global EDGE_ELEMENT, ALL_TRANSISTOR, EDGE, RED_DEL
     canvas.delete(RED_DEL[EDGE_ELEMENT.index(DEE)])
-    FEO = check_versh(DEE.out_x, DEE.out_y, 2)
-    FEI = check_versh(DEE.in_x, DEE.in_y, 2)
-    if type(FEI) is func_versh_3:
+    FEO = check_vertex(DEE.out_x, DEE.out_y, 2)
+    FEI = check_vertex(DEE.in_x, DEE.in_y, 2)
+    if type(FEI) is func_vertex_3:
         FEI.in_False(DEE.in_x, DEE.in_y)
     else:
         FEI.check = False
     ind1 = None
     ind2 = None
-    for i in range(len(ALL_TRANSISTIR)):
-        if ALL_TRANSISTIR[i][-1] == FEO:
+    for i in range(len(ALL_TRANSISTOR)):
+        if ALL_TRANSISTOR[i][-1] == FEO:
             ind1 = i
-    for i in range(len(ALL_TRANSISTIR)):
-        if ALL_TRANSISTIR[i][-1] == FEI:
+    for i in range(len(ALL_TRANSISTOR)):
+        if ALL_TRANSISTOR[i][-1] == FEI:
             ind2 = i
     if ind1 is not None and ind2 is not None and ind1 in EDGE[ind2]:
         EDGE[ind2].remove(ind1)
@@ -533,14 +427,16 @@ def delete_edge(DEE):
     DEE.delete()
 
 
-def TEST(event):
-    print(VERSH)  # Массив вершин
+def TEST(_):
+    """Функция для отладки"""
+    print(VERTEX)  # Массив вершин
     print(EDGE)  # Массив рёбер
     print(START)  # Массив стартовых вершин
-    print(FINALL)  # Массив финальных вершин
+    print(FINAL)  # Массив финальных вершин
 
 
-def INFO(event):
+def INFO(_):
+    """Создаёт окно с ознокомительной информацией"""
     Temp_windows = Toplevel(root)
     Temp_windows.resizable(False, False)
     Temp_windows.minsize(200, 200)
@@ -554,6 +450,7 @@ def INFO(event):
 
 
 def Color_Button():
+    """Перекрашивает кнопки в стандартный цвет"""
     bAND['bg'] = 'SystemButtonFace'
     bOR['bg'] = 'SystemButtonFace'
     bNO['bg'] = 'SystemButtonFace'
@@ -571,10 +468,11 @@ def Clear_RED_DEL():
 
 
 def DEL(event):
-    global FUNCELEMENT, RED_DEL
+    """Вывод на экран маркеров удаления"""
+    global FUNC_ELEMENT, RED_DEL
     if event.widget['bg'] == '#00ff00':
         event.widget['bg'] = 'SystemButtonFace'
-        FUNCELEMENT = None
+        FUNC_ELEMENT = None
         Clear_RED_DEL()
         RED_DEL = list()
         return
@@ -584,16 +482,17 @@ def DEL(event):
         sr_x = (ee.in_x + ee.out_x) // 2
         sr_y = (ee.in_y + ee.out_y) // 2
         RED_DEL.append(canvas.create_oval(sr_x - 4, sr_y - 4, sr_x + 4, sr_y + 4, fill='red'))
-    for ee in ALL_TRANSISTIR:
+    for ee in ALL_TRANSISTOR:
         RED_DEL.append(canvas.create_oval(ee[-1].x - 4, ee[-1].y - 4, ee[-1].x + 4, ee[-1].y + 4, fill='red'))
-    FUNCELEMENT = "DEL"
+    FUNC_ELEMENT = "DEL"
 
 
 def BUTTON(event):
-    global FUNCELEMENT, BUFFER_X, BUFFER_Y, BUFFER_TIP, RED_DEL
+    """Изменяет FUNC_ELEMENT на текст с нажатой кнопки"""
+    global FUNC_ELEMENT, BUFFER_X, BUFFER_Y, BUFFER_TIP, RED_DEL
     Clear_RED_DEL()
     RED_DEL = list()
-    FUNCELEMENT = event.widget.cget('text')
+    FUNC_ELEMENT = event.widget.cget('text')
     Color_Button()
     event.widget['bg'] = '#00ff00'
     if v is not None:
@@ -603,12 +502,13 @@ def BUTTON(event):
     BUFFER_TIP = None
 
 
-def CREATE(event):
+def CREATE(_):
+    """Вывод результатов СФЭ"""
     result = []
     try:
         for TS in generate_bit_set(TEMP_START):
             TS = list(map(int, TS))
-            result.append([[TS[i] for i in range(len(START)) if START[i] == -1], calculate_finish_sign(TS, FINALL, VERSH, EDGE)])
+            result.append([[TS[i] for i in range(len(START)) if START[i] == -1], calculate_finish_sign(TS, FINAL, VERTEX, EDGE)])
     except:
         result = None
     flag = 1
@@ -639,8 +539,9 @@ def CREATE(event):
     bCREATE.grid_remove()
 
 
-def fSTART(event):
-    if bCREATESTART['state'] == DISABLED:
+def fSTART(_):
+    """Задаёт значения стартовых ФЭ"""
+    if bCREATE_START['state'] == DISABLED:
         return
     global TEMP_START
     Temp_text = "".join(i for i in lSTART.get() if i == '1' or i == '0' or i == '?')
@@ -657,11 +558,12 @@ def fSTART(event):
         bCREATE.grid_remove()
 
 
-def CLEAR(event):
-    global FUNCELEMENT, BUFFER_X, BUFFER_Y, BUFFER_TIP, v
-    global FUNCTIONAL_ELEMENT, EDGE_ELEMENT, FINALL, START_LIST, ALL_TRANSISTIR, \
-        NO_ELEMENT, EDGE, START, VERSH, FINALL_LIST, TEMP_START, RED_DEL
-    FUNCELEMENT = None
+def CLEAR(_):
+    """Очищает все переменные"""
+    global FUNC_ELEMENT, BUFFER_X, BUFFER_Y, BUFFER_TIP, v
+    global FUNCTIONAL_ELEMENT, EDGE_ELEMENT, FINAL, START_LIST, ALL_TRANSISTOR, \
+        NO_ELEMENT, EDGE, START, VERTEX, FINAL_LIST, TEMP_START, RED_DEL
+    FUNC_ELEMENT = None
     BUFFER_X = None
     BUFFER_Y = None
     BUFFER_TIP = None
@@ -671,61 +573,18 @@ def CLEAR(event):
     FUNCTIONAL_ELEMENT = list()
     EDGE_ELEMENT = list()
     START_LIST = list()
-    FINALL_LIST = list()
+    FINAL_LIST = list()
     NO_ELEMENT = list()
-    ALL_TRANSISTIR = list()
+    ALL_TRANSISTOR = list()
     TEMP_START = []
     START = []
-    VERSH = []
+    VERTEX = []
     EDGE = []
-    FINALL = []
+    FINAL = []
     canvas.delete("all")
-    bCREATESTART['state'] = DISABLED
+    bCREATE_START['state'] = DISABLED
     bCREATE.grid_remove()
 
-
-root = Tk()
-root.title("Functional element network")
-root.resizable(True, True)
-root.grid_columnconfigure((0, 1, 2, 3), weight=1)
-root.grid_rowconfigure(2, weight=1)
-
-canvas = Canvas(root, width=canvas_width, height=canvas_height, bg="white")
-bAND = Button(text="AND", command=None)
-bOR = Button(text="OR", command=None)
-bNO = Button(text="NO", command=None)
-bEDGE = Button(text="EDGE", command=None)
-bSTART = Button(text="Start", command=None)
-bFINISH = Button(text="Finish", command=None)
-bONE = Button(text="0", command=None)
-bZERO = Button(text="1", command=None)
-bDEL = Button(text="Удалить", command=None)
-bCREATE = Button(text="Посчитать", command=None)
-bCHECK = Button(text="Информация", command=None)
-bCLEAR = Button(text="Очистить поле", command=None)
-lSTART = Entry()
-lFINISH = Label(bg='#ffffff')
-LabelFinish = Label(text="          Finish:          ", anchor="center")
-bCREATESTART = Button(root, text="Задать Start", command=None, state=DISABLED)
-
-bAND.grid(row=0, column=0, sticky=N + S + W + E)
-bOR.grid(row=0, column=1, sticky=N + S + W + E)
-bNO.grid(row=0, column=2, sticky=N + S + W + E)
-bEDGE.grid(row=0, column=3, sticky=N + S + W + E)
-bSTART.grid(row=1, column=0, sticky=N + S + W + E)
-bFINISH.grid(row=1, column=1, sticky=N + S + W + E)
-bONE.grid(row=1, column=2, sticky=N + S + W + E)
-bZERO.grid(row=1, column=3, sticky=N + S + W + E)
-canvas.grid(row=2, column=0, columnspan=4, sticky=N + S + W + E)
-bCHECK.grid(row=3, column=0, sticky=N + S + W + E)
-bDEL.grid(row=3, column=1, sticky=N + S + W + E)
-bCREATE.grid(row=3, column=2, columnspan=1, sticky=N + S + W + E)
-bCREATE.grid_remove()
-bCLEAR.grid(row=3, column=3, sticky=N + S + W + E)
-bCREATESTART.grid(row=4, column=0, sticky=N + S + W + E)
-lSTART.grid(row=4, column=1, sticky=N + S + W + E)
-LabelFinish.grid(row=4, column=2, sticky=N + S + W + E)
-lFINISH.grid(row=4, column=3, sticky=N + S + W + E)
 
 bAND.bind("<Button-1>", BUTTON)
 bOR.bind("<Button-1>", BUTTON)
@@ -740,7 +599,7 @@ bCREATE.bind("<Button-1>", CREATE)
 # bCHECK.bind("<Button-1>", TEST)
 bCHECK.bind("<Button-1>", INFO)
 bCLEAR.bind("<Button-1>", CLEAR)
-bCREATESTART.bind("<Button-1>", fSTART)
+bCREATE_START.bind("<Button-1>", fSTART)
 canvas.bind("<Button-1>", paint)
 canvas.bind("<Button-3>", back_line)
 
