@@ -134,7 +134,7 @@ class func_edge:
         :param x: координата x
         :param y: координата y
         """
-        x_new, y_new = shift_point(self.out_x, self.out_y, x, y)
+        x_new, y_new = shift_point(x, y, self.out_x, self.out_y)
         self.line = canvas.create_line(x_new, y_new, self.out_x, self.out_y)
         x1, y1, x2, y2 = calculate_cursor_points(self.out_x, self.out_y, x_new, y_new)
         self.line1 = canvas.create_line(x_new, y_new, x1, y1, width=2)
