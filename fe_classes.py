@@ -1,18 +1,35 @@
 """Модуль, содержащий в себе классы функциональных элементов"""
+# from abc import abstractmethod
 
 from win_global import *
-
 from geometry import calculate_cursor_points, shift_point
+
+"""
+class allFE:
+    def __init__(self, x: int, y: int):
+        self.x = x
+        self.y = y
+
+    @abstractmethod
+    def draw(self):
+        pass
+
+    @abstractmethod
+    def delete(self):
+        pass
+"""
 
 
 class func_vertex_3:
     """Класс для функциональных элементов AND и OR"""
+
     def __init__(self, view: str, x: int, y: int):
         """
         :param view: Вид элемнета (AND или OR)
         :param x: Координата x центра элемента
         :param y: Координата y центра элемента
         """
+        # super().__init__(x, y)
         self.x = x  # Координаты центра элемента
         self.y = y
         self.in1_x = x - 15  # Координаты левого входа
@@ -91,6 +108,7 @@ class func_vertex_3:
 
 class func_edge:
     """Класс для рёбер СФЭ"""
+
     def __init__(self, in_x, in_y, out_x, out_y, class1, class2):
         """
         :param in_x: Координата x входа
@@ -131,6 +149,7 @@ class func_edge:
 
 class Start_vertex:
     """Класс для функциональных элементов START"""
+
     def __init__(self, x, y, value, text):
         """
         :param x: Координата x центра элемента
@@ -173,6 +192,7 @@ class Start_vertex:
 
 class Finish_vertex:
     """Класс для функциональных элементов FINISH"""
+
     def __init__(self, x, y, text):
         """
         :param x: Координата x центра элемента
@@ -210,6 +230,7 @@ class Finish_vertex:
 
 class NO_vertex:
     """Класс для функциональных элементов NO"""
+
     def __init__(self, x, y):
         """
         :param x: Координата x центра элемента

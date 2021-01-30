@@ -104,9 +104,152 @@ def check_edge():
     return False
 
 
-def back_line():
+def back_line(_):
     """Отменяет ребро"""
     global BUFFER_X, BUFFER_Y, BUFFER_TIP
+    BUFFER_X = None
+    BUFFER_Y = None
+    BUFFER_TIP = None
+    if v is not None:
+        canvas.delete(v)
+
+
+def FUNC_ELEMENT_OR(x: int, y: int):
+    a = func_vertex_3("OR", x, y)
+    EDGE.append([])
+    ALL_TRANSISTOR.append([5, 5, a])
+    FUNCTIONAL_ELEMENT.append(a)
+    VERTEX.append([5, 5])
+    a.draw()
+
+
+def FUNC_ELEMENT_AND(x: int, y: int):
+    a = func_vertex_3("AND", x, y)
+    EDGE.append([])
+    ALL_TRANSISTOR.append([6, 6, a])
+    FUNCTIONAL_ELEMENT.append(a)
+    VERTEX.append([6, 6])
+    a.draw()
+
+
+def FUNC_ELEMENT_START(x: int, y: int, flag: int):
+    global FUNC_ELEMENT
+    if flag == 1:
+        FUNC_ELEMENT = "Start"
+    elif flag == 2:
+        FUNC_ELEMENT = "1"
+    elif flag == 3:
+        FUNC_ELEMENT = "0"
+    a = Start_vertex(x, y, FUNC_ELEMENT, str(START.count(-1) + 1))
+    EDGE.append([])
+    ALL_TRANSISTOR.append([3, len(START_LIST), a])
+    VERTEX.append([3, len(START_LIST)])
+    START_LIST.append(a)
+    if FUNC_ELEMENT == "Start":
+        START.append(-1)
+    elif FUNC_ELEMENT == "1":
+        START.append(1)
+    elif FUNC_ELEMENT == "0":
+        START.append(0)
+    a.paint()
+
+
+def FUNC_ELEMENT_FINISH(x: int, y: int):
+    a = Finish_vertex(x, y, str(len(FINAL_LIST) + 1))
+    FINAL.append(len(ALL_TRANSISTOR))
+    VERTEX.append([7, 7])
+    FINAL_LIST.append(a)
+    EDGE.append([])
+    ALL_TRANSISTOR.append([7, 7, a])
+    a.paint()
+
+
+def FUNC_ELEMENT_NO(x: int, y: int):
+    a = NO_vertex(x, y)
+    EDGE.append([])
+    VERTEX.append([4, 4])
+    NO_ELEMENT.append(a)
+    ALL_TRANSISTOR.append([4, 4, a])
+    a.paint()
+
+
+def EDGE_1_POINT(x: int, y: int):
+    global BUFFER_X, BUFFER_Y, v
+    FE = check_vertex(x, y, 1)
+    if FE:
+        BUFFER_X = x
+        BUFFER_Y = y
+        v = canvas.create_oval(50, 50, 75, 75, outline="#000000", fill="#00ff00")
+
+
+def EDGE_2_POINT(x: int, y: int):
+    global BUFFER_X, BUFFER_Y, BUFFER_TIP, v
+    tip = BUFFER_TIP
+    if BUFFER_X is None or BUFFER_Y is None:  # Заплатка
+        BUFFER_X, BUFFER_Y = -1, -1
+    class1 = check_vertex(BUFFER_X, BUFFER_Y, 1)
+    if check_vertex(x, y, 0):
+        class2 = check_vertex(x, y, 1)
+        if BUFFER_TIP != tip and (class1.x != class2.x or class1.y != class2.y) and (
+                BUFFER_TIP != 3 or tip != 2) and (BUFFER_TIP != 2 or tip != 3) and (
+                BUFFER_TIP != 5 or tip != 1) and (BUFFER_TIP != 1 or tip != 5) and (
+                BUFFER_TIP != 1 or tip != 4) and (BUFFER_TIP != 4 or tip != 1) and (
+                BUFFER_TIP != 3 or tip != 6) and (BUFFER_TIP != 6 or tip != 3) and (
+                BUFFER_TIP != 2 or tip != 6) and (BUFFER_TIP != 6 or tip != 2) and (
+                BUFFER_TIP != 5 or tip != 4) and (BUFFER_TIP != 4 or tip != 5):
+            if BUFFER_TIP == 1:
+                class2.check_in(x, y)
+            elif tip == 1:
+                class1.check_in(BUFFER_X, BUFFER_Y)
+            elif BUFFER_TIP == 4:
+                class2.check = True
+            elif tip == 4:
+                class1.check = True
+            elif BUFFER_TIP == 5:
+                class2.check = True
+            elif tip == 5:
+                class1.check = True
+            flag = check_edge()
+            if flag:
+                a = func_edge(x, y, BUFFER_X, BUFFER_Y, class2, class1)
+            else:
+                a = func_edge(BUFFER_X, BUFFER_Y, x, y, class1, class2)
+            in1 = -1
+            in2 = -1
+            for i in range(len(ALL_TRANSISTOR)):
+                if ALL_TRANSISTOR[i][-1] == class1:
+                    in1 = i
+            for i in range(len(ALL_TRANSISTOR)):
+                if ALL_TRANSISTOR[i][-1] == class2:
+                    in2 = i
+            if flag:
+                EDGE[in2].append(in1)
+            else:
+                EDGE[in1].append(in2)
+            EDGE_ELEMENT.append(a)
+            if flag:
+                if type(class2) == func_vertex_3:
+                    a.draw(*class2.select_in(x, y))
+                else:
+                    a.draw(class2.in_x, class2.in_y)
+            else:
+                if type(class1) == func_vertex_3:
+                    a.draw(*class1.select_in(BUFFER_X, BUFFER_Y))
+                else:
+                    a.draw(class1.in_x, class1.in_y)
+            try:
+                result = calculate_finish_sign([0] * len(START), FINAL, VERTEX, EDGE)
+                flag = 1
+                if result is not None:
+                    for r in result:
+                        if r is None:
+                            flag = 0
+                if result is None or result == [] or not flag:
+                    bCREATE_START['state'] = DISABLED
+                else:
+                    bCREATE_START['state'] = NORMAL
+            except:
+                bCREATE_START['state'] = DISABLED
     BUFFER_X = None
     BUFFER_Y = None
     BUFFER_TIP = None
@@ -128,134 +271,31 @@ def paint(event):
 
     # Кнопка OR
     elif FUNC_ELEMENT == "OR":
-        a = func_vertex_3("OR", event.x, event.y)
-        EDGE.append([])
-        ALL_TRANSISTOR.append([5, 5, a])
-        FUNCTIONAL_ELEMENT.append(a)
-        VERTEX.append([5, 5])
-        a.draw()
+        FUNC_ELEMENT_OR(event.x, event.y)
 
     # Кнопка AND
     elif FUNC_ELEMENT == "AND":
-        a = func_vertex_3("AND", event.x, event.y)
-        EDGE.append([])
-        ALL_TRANSISTOR.append([6, 6, a])
-        FUNCTIONAL_ELEMENT.append(a)
-        VERTEX.append([6, 6])
-        a.draw()
+        FUNC_ELEMENT_AND(event.x, event.y)
 
     # Кнопка EDGE, первая точка
     elif FUNC_ELEMENT == "EDGE" and BUFFER_X is None and BUFFER_Y is None and BUFFER_TIP is None:
-        FE = check_vertex(event.x, event.y, 1)
-        if FE:
-            BUFFER_X = event.x
-            BUFFER_Y = event.y
-            v = canvas.create_oval(50, 50, 75, 75, outline="#000000", fill="#00ff00")
+        EDGE_1_POINT(event.x, event.y)
 
     # Кнопка EDGE, вторая точка
     elif FUNC_ELEMENT == "EDGE" and BUFFER_X is not None and BUFFER_Y is not None and BUFFER_TIP is not None:
-        tip = BUFFER_TIP
-        class1 = check_vertex(BUFFER_X, BUFFER_Y, 1)
-        if check_vertex(event.x, event.y, 0):
-            class2 = check_vertex(event.x, event.y, 1)
-            if BUFFER_TIP != tip and (class1.x != class2.x or class1.y != class2.y) and (
-                    BUFFER_TIP != 3 or tip != 2) and (BUFFER_TIP != 2 or tip != 3) and (
-                    BUFFER_TIP != 5 or tip != 1) and (BUFFER_TIP != 1 or tip != 5) and (
-                    BUFFER_TIP != 1 or tip != 4) and (BUFFER_TIP != 4 or tip != 1) and (
-                    BUFFER_TIP != 3 or tip != 6) and (BUFFER_TIP != 6 or tip != 3) and (
-                    BUFFER_TIP != 2 or tip != 6) and (BUFFER_TIP != 6 or tip != 2) and (
-                    BUFFER_TIP != 5 or tip != 4) and (BUFFER_TIP != 4 or tip != 5):
-                if BUFFER_TIP == 1:
-                    class2.check_in(event.x, event.y)
-                elif tip == 1:
-                    class1.check_in(BUFFER_X, BUFFER_Y)
-                elif BUFFER_TIP == 4:
-                    class2.check = True
-                elif tip == 4:
-                    class1.check = True
-                elif BUFFER_TIP == 5:
-                    class2.check = True
-                elif tip == 5:
-                    class1.check = True
-                flag = check_edge()
-                if flag:
-                    a = func_edge(event.x, event.y, BUFFER_X, BUFFER_Y, class2, class1)
-                else:
-                    a = func_edge(BUFFER_X, BUFFER_Y, event.x, event.y, class1, class2)
-                in1 = -1
-                in2 = -1
-                for i in range(len(ALL_TRANSISTOR)):
-                    if ALL_TRANSISTOR[i][-1] == class1:
-                        in1 = i
-                for i in range(len(ALL_TRANSISTOR)):
-                    if ALL_TRANSISTOR[i][-1] == class2:
-                        in2 = i
-                if flag:
-                    EDGE[in2].append(in1)
-                else:
-                    EDGE[in1].append(in2)
-                EDGE_ELEMENT.append(a)
-                if flag:
-                    if type(class2) == func_vertex_3:
-                        a.draw(*class2.select_in(event.x, event.y))
-                    else:
-                        a.draw(class2.in_x, class2.in_y)
-                else:
-                    if type(class1) == func_vertex_3:
-                        a.draw(*class1.select_in(BUFFER_X, BUFFER_Y))
-                    else:
-                        a.draw(class1.in_x, class1.in_y)
-                try:
-                    result = calculate_finish_sign([0] * len(START), FINAL, VERTEX, EDGE)
-                    flag = 1
-                    if result is not None:
-                        for r in result:
-                            if r is None:
-                                flag = 0
-                    if result is None or result == [] or not flag:
-                        bCREATE_START['state'] = DISABLED
-                    else:
-                        bCREATE_START['state'] = NORMAL
-                except:
-                    bCREATE_START['state'] = DISABLED
-        BUFFER_X = None
-        BUFFER_Y = None
-        BUFFER_TIP = None
-        canvas.delete(v)
+        EDGE_2_POINT(event.x, event.y)
 
     # Кнопка START
     elif FUNC_ELEMENT == "Start" or FUNC_ELEMENT == "0" or FUNC_ELEMENT == "1":
-        a = Start_vertex(event.x, event.y, FUNC_ELEMENT, str(START.count(-1) + 1))
-        EDGE.append([])
-        ALL_TRANSISTOR.append([3, len(START_LIST), a])
-        VERTEX.append([3, len(START_LIST)])
-        START_LIST.append(a)
-        if FUNC_ELEMENT == "Start":
-            START.append(-1)
-        elif FUNC_ELEMENT == "1":
-            START.append(1)
-        elif FUNC_ELEMENT == "0":
-            START.append(0)
-        a.paint()
+        FUNC_ELEMENT_START(event.x, event.y, 0)
 
     # Кнопка FINISH
     elif FUNC_ELEMENT == "Finish":
-        a = Finish_vertex(event.x, event.y, str(len(FINAL_LIST) + 1))
-        FINAL.append(len(ALL_TRANSISTOR))
-        VERTEX.append([7, 7])
-        FINAL_LIST.append(a)
-        EDGE.append([])
-        ALL_TRANSISTOR.append([7, 7, a])
-        a.paint()
+        FUNC_ELEMENT_FINISH(event.x, event.y)
 
     # Кнопка NO
     elif FUNC_ELEMENT == "NO":
-        a = NO_vertex(event.x, event.y)
-        EDGE.append([])
-        VERTEX.append([4, 4])
-        NO_ELEMENT.append(a)
-        ALL_TRANSISTOR.append([4, 4, a])
-        a.paint()
+        FUNC_ELEMENT_NO(event.x, event.y)
 
     # Кнопка DEL ("Удалить")
     elif FUNC_ELEMENT == "DEL":
@@ -586,6 +626,54 @@ def CLEAR(_):
     bCREATE.grid_remove()
 
 
+def SAFE():
+    file_name_save = file_save()
+    with open(file_name_save, "w") as f:
+        print(len(ALL_TRANSISTOR), file=f)
+        for function_el in ALL_TRANSISTOR:
+            print(str(function_el[0]) + " " + str(function_el[1]) + " "
+                  + str(function_el[2].x) + " " + str(function_el[2].y), file=f)
+        print(len(EDGE_ELEMENT), file=f)
+        for function_edge in EDGE_ELEMENT:
+            print(str(function_edge.in_x) + " " + str(function_edge.in_y) + " "
+                  + str(function_edge.out_x) + " " + str(function_edge.out_y), file=f)
+
+def OPEN():
+    CLEAR(1)
+    file_name_open = file_open()
+    with open(file_name_open, "r") as f:
+        count = int(f.readline())
+        for i in range(count):
+            fel = list(map(int, f.readline().split()))
+            if fel[0] == 0:
+                FUNC_ELEMENT_START(fel[2], fel[3], 3)
+            if fel[0] == 1:
+                FUNC_ELEMENT_START(fel[2], fel[3], 2)
+            if fel[0] == 3:
+                FUNC_ELEMENT_START(fel[2], fel[3], 1)
+            if fel[0] == 4:
+                FUNC_ELEMENT_NO(fel[2], fel[3])
+            if fel[0] == 5:
+                FUNC_ELEMENT_OR(fel[2], fel[3])
+            if fel[0] == 6:
+                FUNC_ELEMENT_AND(fel[2], fel[3])
+            if fel[0] == 7:
+                FUNC_ELEMENT_FINISH(fel[2], fel[3])
+        count = int(f.readline())
+        for i in range(count):
+            fel = list(map(int, f.readline().split()))
+            EDGE_1_POINT(fel[0], fel[1])
+            EDGE_2_POINT(fel[2], fel[3])
+
+
+def NEW():
+    CLEAR(1)
+
+
+def CLOSE():
+    root.destroy()
+
+
 bAND.bind("<Button-1>", BUTTON)
 bOR.bind("<Button-1>", BUTTON)
 bNO.bind("<Button-1>", BUTTON)
@@ -602,5 +690,11 @@ bCLEAR.bind("<Button-1>", CLEAR)
 bCREATE_START.bind("<Button-1>", fSTART)
 canvas.bind("<Button-1>", paint)
 canvas.bind("<Button-3>", back_line)
+
+file_menu.add_command(label='Открыть...', command=OPEN)
+file_menu.add_command(label='Новый', command=NEW)
+file_menu.add_command(label='Сохранить...', command=SAFE)
+file_menu.add_separator()
+file_menu.add_command(label='Выход', command=CLOSE)
 
 root.mainloop()

@@ -1,6 +1,8 @@
 """Модуль, содержащий в себе окно программы"""
 
 from tkinter import *
+from tkinter import filedialog
+import os
 
 canvas_width = 700
 canvas_height = 500
@@ -9,9 +11,10 @@ brush_color = "black"  # Цвет кисти
 
 root = Tk()
 root.title("Functional element network")  # Имя окна
-# file_menu = Menu(root)
-# root.config(menu=file_menu)
-# file_menu.add_command(label='Файл')
+main_menu = Menu(root)
+root.config(menu=main_menu)
+file_menu = Menu(tearoff=0)
+main_menu.add_cascade(label="Файл", menu=file_menu)
 root.resizable(True, True)
 root.minsize(360, 240)
 root.grid_rowconfigure(1, weight=1)
@@ -69,6 +72,22 @@ def button_place():
     lSTART.grid(row=1, column=1, sticky=N + S + W + E)
     LabelFinish.grid(row=1, column=2, sticky=N + S + W + E)
     lFINISH.grid(row=1, column=3, sticky=N + S + W + E)
+
+
+def file_save():
+    file_name_save = filedialog.asksaveasfilename(title="Please select a file",
+                                                  initialdir=os.getcwd(),
+                                                  filetypes=(("All files", "*.*"),),
+                                                  defaultextension=".sfe")
+    return file_name_save
+
+
+def file_open():
+    file_name_open = filedialog.askopenfilename(title="Please select a file",
+                                                initialdir=os.getcwd(),
+                                                multiple=False,
+                                                filetypes=(('SFE files', '*.sfe'),))
+    return file_name_open
 
 
 button_place()
